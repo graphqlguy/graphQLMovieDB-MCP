@@ -134,6 +134,34 @@
 			<artifactId>bucket4j_jdk17-core</artifactId>
 			<version>8.14.0</version>
 		</dependency>
+		<!-- Class 17: production observability. Actuator + a Micrometer registry
+		     expose per-tool metrics on /actuator/prometheus. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<!-- Class 17: tracing. The bridge lets Micrometer's Observation API emit
+		     OpenTelemetry spans; the OTLP exporter ships them to a collector. -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-otel</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.opentelemetry</groupId>
+			<artifactId>opentelemetry-exporter-otlp</artifactId>
+		</dependency>
+		<!-- Class 17: structured JSON logging with a separate audit.mcp appender
+		     (logback-spring.xml). Boot's one-line logging.structured.format is the
+		     lighter alternative; the encoder is the customization path. -->
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>9.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>

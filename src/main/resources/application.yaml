@@ -82,3 +82,20 @@ graphql:
   # breaks GraphiQL docs/autocomplete and codegen tooling.
   max-query-depth: 15
   slow-resolver-threshold-ms: 100
+# Class 17: production observability. The Prometheus registry exposes per-tool
+# meters (ToolMetricsAspect) on /actuator/prometheus; percentile histograms turn
+# mcp.tool.duration into latency buckets. Tracing samples every request in dev
+# (sampling 1.0); the OTLP endpoint is set per-environment in
+# application-production.yaml so the default profile ships no collector address.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        mcp.tool.duration: true
+  tracing:
+    sampling:
+      probability: 1.0

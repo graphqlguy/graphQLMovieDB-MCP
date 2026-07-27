@@ -1,0 +1,30 @@
+# Class 17: production profile. Activate with SPRING_PROFILES_ACTIVE=production.
+# Secrets (issuer, audience) come from the environment, never from source; the
+# actuator surface is scoped to health/info/prometheus and health details are
+# hidden so nothing leaks to whoever can reach the actuator path.
+spring:
+  ai:
+    mcp:
+      server:
+        type: SYNC
+        protocol: STREAMABLE
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${MCP_JWT_ISSUER}
+          audiences:
+            - ${MCP_JWT_AUDIENCE}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: never
+  otlp:
+    tracing:
+      endpoint: http://otel-collector:4318/v1/traces
+      headers: {}
