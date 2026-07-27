@@ -1,0 +1,9 @@
+query RecommendMoviesForMood($mood: Mood!, $excludeWatched: Boolean = false) {
+  recommendMoviesForMood(mood: $mood, excludeWatched: $excludeWatched) {
+    id
+    title
+    releaseYear
+    genre
+    averageRating
+  }
+}

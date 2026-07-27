@@ -1,0 +1,9 @@
+mutation AddToWatchlist($subject: WatchlistSubjectInput!, $status: WatchStatus) {
+  addToWatchlist(subject: $subject, status: $status) {
+    id
+    status
+    content {
+      title
+    }
+  }
+}

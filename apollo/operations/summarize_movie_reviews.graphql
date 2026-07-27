@@ -1,0 +1,9 @@
+query SummarizeMovieReviews($movieId: ID!) {
+  summarizeMovieReviews(movieId: $movieId) {
+    movieId
+    reviewCount
+    overallSentiment
+    themes
+    generatedAt
+  }
+}

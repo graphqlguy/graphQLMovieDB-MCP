@@ -1,0 +1,18 @@
+endpoint: http://localhost:8080/graphql
+
+transport:
+  type: streamable_http
+  address: 127.0.0.1
+  port: 8000
+
+schema:
+  source: local
+  path: ./schema.graphqls
+
+operations:
+  source: local
+  paths:
+    - ./operations
+
+overrides:
+  mutation_mode: explicit
