@@ -5,9 +5,11 @@ import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.mcp.annotation.provider.tool.SyncMcpToolProvider;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -29,9 +31,19 @@ public class SchemaDescriptionToolSpecifications {
             HelloMcpTool helloMcpTool,
             SchemaDescriptionProvider descriptions) {
 
+        // Class 15: @PreAuthorize on the tool methods makes MovieMcpTools a
+        // CGLIB proxy whose generated methods do not carry the @McpTool
+        // annotation, so the stock scanner (getClass().getDeclaredMethods())
+        // finds nothing. Scan the target class instead; because Method.invoke
+        // dispatches virtually, the handler still invokes through the proxy, so
+        // the @PreAuthorize advice runs on every tool call.
         List<McpServerFeatures.SyncToolSpecification> scanned =
-            new SyncMcpToolProvider(List.of(movieMcpTools, helloMcpTool))
-                .getToolSpecifications();
+            new SyncMcpToolProvider(List.of(movieMcpTools, helloMcpTool)) {
+                @Override
+                protected Method[] doGetClassMethods(Object bean) {
+                    return AopUtils.getTargetClass(bean).getDeclaredMethods();
+                }
+            }.getToolSpecifications();
 
         return scanned.stream()
             .map(spec -> withSchemaDescription(spec, descriptions))

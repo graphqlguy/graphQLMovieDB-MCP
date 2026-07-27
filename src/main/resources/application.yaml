@@ -47,6 +47,18 @@ spring:
         # (SyncToolSpecification list); the scanner would register duplicates.
         annotation-scanner:
           enabled: false
+  # Class 15: the /mcp chain validates JWTs minted by an external OAuth 2.1
+  # authorization server. The example points at a Keycloak realm; swap in your
+  # platform's issuer. jwk-set-uri keeps the decoder lazy (no fetch at startup),
+  # issuer-uri and audiences add iss/aud validation.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://auth.example.com/realms/moviedb
+          audiences:
+            - moviedb-mcp
+          jwk-set-uri: https://auth.example.com/realms/moviedb/protocol/openid-connect/certs
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
   expiration: 86400000
@@ -58,6 +70,12 @@ tmdb:
   api-key: ${TMDB_API_KEY:}
   base-url: https://api.themoviedb.org/3
   image-base-url: https://image.tmdb.org/t/p/w500
+moviedb:
+  mcp:
+    # Class 15: the canonical resource URI (RFC 8707). Clients send
+    # resource=<this> when requesting a token; the audiences entry above is the
+    # server half that rejects tokens minted for anything else.
+    resource: https://api.example.com/mcp
 graphql:
   # Instrumentation configuration
   # 15, not 10: the standard introspection query is depth 13, so anything lower

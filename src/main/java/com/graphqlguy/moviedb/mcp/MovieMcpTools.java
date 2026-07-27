@@ -22,6 +22,7 @@ import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
 import org.springframework.graphql.ExecutionGraphQlService;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -114,6 +115,9 @@ public class MovieMcpTools {
             openWorldHint = false
         )
     )
+    // Class 15: reads require movies:read. SCOPE_ is Spring Security's prefix
+    // for OAuth scopes mapped from the JWT scope claim.
+    @PreAuthorize("hasAuthority('SCOPE_movies:read')")
     public List<MovieSummary> recommendMoviesForMood(
             @McpToolParam(
                 description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDIC) and an optional excludeWatched flag, default false, which filters out movies the signed-in user has already marked WATCHED on their watchlist.",
@@ -152,6 +156,7 @@ public class MovieMcpTools {
             openWorldHint = false
         )
     )
+    @PreAuthorize("hasAuthority('SCOPE_movies:read') and hasAuthority('SCOPE_reviews:read')")
     public MovieReviewSummary summarizeMovieReviews(
             // Class 10: both special parameters are filled in by the framework
             // and never appear in the tool's input schema. context.progress(...)
@@ -273,6 +278,8 @@ public class MovieMcpTools {
             openWorldHint = false
         )
     )
+    // Class 15: a write to user-owned data requires watchlist:write.
+    @PreAuthorize("hasAuthority('SCOPE_watchlist:write')")
     public CallToolResult addToWatchlist(
             McpSyncRequestContext context,
             @McpToolParam(description = "The title to add: exactly one of movieId or tvShowId.", required = true)

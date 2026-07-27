@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import tools.jackson.databind.ObjectMapper;
 
@@ -16,7 +17,9 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+// Class 15: authenticate against the resource-server-protected /mcp endpoint.
 @SpringBootTest(webEnvironment = RANDOM_PORT)
+@Import(McpSecurityTestConfig.class)
 class ToolSchemaContractTest {
 
     @LocalServerPort int port;
@@ -27,6 +30,8 @@ class ToolSchemaContractTest {
         var transport = HttpClientStreamableHttpTransport
             .builder("http://localhost:" + port)
             .endpoint("/mcp")
+            .httpRequestCustomizer((builder, method, uri, body, ctx) -> builder.header(
+                "Authorization", "Bearer " + McpSecurityTestConfig.TEST_TOKEN))
             .build();
         McpSyncClient client = McpClient.sync(transport).build();
         client.initialize();
