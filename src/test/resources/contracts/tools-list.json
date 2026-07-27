@@ -89,6 +89,48 @@
     "openWorldHint" : false
   }
 }, {
+  "name" : "confirmAction",
+  "title" : "confirmAction",
+  "description" : "Execute a previously staged action by confirmation token. Single-use.\nTokens expire 60 seconds after staging.\n",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "confirmationToken" : {
+        "type" : "string"
+      }
+    },
+    "required" : [ "confirmationToken" ]
+  },
+  "annotations" : {
+    "title" : "",
+    "readOnlyHint" : false,
+    "destructiveHint" : true,
+    "idempotentHint" : false,
+    "openWorldHint" : true
+  }
+}, {
+  "name" : "stageRemoveFromWatchlist",
+  "title" : "Stage Remove From Watchlist",
+  "description" : "Stage removal of an item from the signed-in user's watch list.\nReturns a confirmation token. The actual removal only happens when\nthe user calls confirmAction with the returned token within\n60 seconds. Tokens are single-use.\n",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "itemId" : {
+        "type" : "string"
+      }
+    },
+    "required" : [ "itemId" ]
+  },
+  "annotations" : {
+    "title" : "Stage Remove From Watchlist",
+    "readOnlyHint" : false,
+    "destructiveHint" : true,
+    "idempotentHint" : false,
+    "openWorldHint" : false
+  }
+}, {
   "name" : "ping",
   "title" : "ping",
   "description" : "Smoke-test tool. Returns a greeting that echoes the supplied name. Used during Class 6 to verify the MCP server wiring before real tools are added in Class 7.",

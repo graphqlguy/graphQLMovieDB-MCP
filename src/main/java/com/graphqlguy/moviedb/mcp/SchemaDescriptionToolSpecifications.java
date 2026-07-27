@@ -28,6 +28,7 @@ public class SchemaDescriptionToolSpecifications {
     @Bean
     public List<McpServerFeatures.SyncToolSpecification> schemaDescribedTools(
             MovieMcpTools movieMcpTools,
+            SafeMutationTools safeMutationTools,
             HelloMcpTool helloMcpTool,
             SchemaDescriptionProvider descriptions) {
 
@@ -38,7 +39,7 @@ public class SchemaDescriptionToolSpecifications {
         // dispatches virtually, the handler still invokes through the proxy, so
         // the @PreAuthorize advice runs on every tool call.
         List<McpServerFeatures.SyncToolSpecification> scanned =
-            new SyncMcpToolProvider(List.of(movieMcpTools, helloMcpTool)) {
+            new SyncMcpToolProvider(List.of(movieMcpTools, safeMutationTools, helloMcpTool)) {
                 @Override
                 protected Method[] doGetClassMethods(Object bean) {
                     return AopUtils.getTargetClass(bean).getDeclaredMethods();

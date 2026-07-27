@@ -53,4 +53,11 @@ public final class MovieOperations {
           }
         }
         """;
+
+    // Class 16: the real mutation behind the stage-and-confirm flow.
+    public static final String REMOVE_FROM_WATCHLIST = """
+        mutation RemoveFromWatchlist($itemId: ID!) {
+          removeFromWatchlist(itemId: $itemId)
+        }
+        """;
 }
