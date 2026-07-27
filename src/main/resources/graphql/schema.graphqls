@@ -34,37 +34,110 @@ union SearchResult = Movie | Person | TvShow
 
 """Something watchable: the fields a Movie and a TV show have in common."""
 interface Content {
+    """The title's display name as stored in the catalog."""
     title: String!
+    """The single primary genre the catalog tracks. Null when unclassified."""
     genre: Genre
+    """The catalog's stored average rating, 0.0 to 10.0. Null means "no data on record," not "rated zero"."""
     rating: Float
+    """URL of the poster image. Null when no poster is recorded."""
     posterUrl: String
 }
 
 """
-    Custom Movie type
-    All movie details are taken from The Movie Database (TMDB)
-    Triple quotes allow multiline documentation.
+A movie in the catalog. Movies are the central entity of the system and the
+unit most other operations resolve against. Catalog data is seeded from
+The Movie Database (TMDB); live TMDB signals surface only through
+`communityRating`.
 """
-# We will expand the Movie type as we progress through the tutorial
 type Movie implements Content {
+    """
+    The catalog's own stable numeric identifier for this movie. Safe to cache
+    and to pass back into other operations. Not the TMDB identifier; that is
+    `tmdbId`.
+    """
     id: ID!
+
+    """The movie's display title as stored in the catalog."""
     title: String!
+
+    """
+    The four-digit year of the movie's release as recorded in the catalog.
+    Write-time validation bounds it to 1888-2100; a year in the future means
+    the catalog recorded an announced release and should be treated as
+    provisional, since release dates slip.
+    """
     releaseYear: Int!
+
+    """
+    The single primary genre the catalog tracks for this movie. Most films
+    span several genres; this is the one the catalog chose to surface, not
+    the only one that applies. Null when the title has not been classified.
+    """
     genre: Genre
-    "Average rating from 0 to 10"
-    rating: Float
-    "Runtime in minutes"
+
+    """
+    The catalog's stored average rating, from 0.0 to 10.0 inclusive. Kept for
+    compatibility with clients reading `rating` through the `Content`
+    interface; new selections should read `averageRating` instead.
+    """
+    rating: Float @deprecated(reason: "Use averageRating instead.")
+
+    """
+    The catalog's stored average rating for this movie, from 0.0 to 10.0
+    inclusive, captured when the title entered the catalog. Null when the
+    catalog has no rating on record, which is "no data," not "rated zero"
+    and not "a bad movie." For a live community score fetched from TMDB at
+    request time, read `communityRating` instead.
+    """
+    averageRating: Float
+
+    """Runtime in minutes. Null when the catalog does not know it."""
     runtime: Int
+
+    """Short plot synopsis. Null when none is recorded."""
     plot: String
+
+    """URL of the poster image. Null when no poster is recorded."""
     posterUrl: String
-    "The Movie Database (TMDB) external identifier"
+
+    """
+    The Movie Database (TMDB) external identifier. Null when the title has
+    no TMDB link, in which case `communityRating` is also null.
+    """
     tmdbId: Int
-    """Live community rating from TMDB; null when the movie has no tmdbId or TMDB is unavailable"""
+
+    """
+    Live community rating fetched from TMDB at request time; the freshest
+    audience signal available, distinct from `averageRating`, the catalog's
+    stored figure. Null when the movie has no `tmdbId` or TMDB is
+    unavailable; null never means "poorly rated."
+    """
     communityRating: CommunityRating
+
+    """
+    The directors on record for this movie. An empty list means the catalog
+    has no director recorded for the title, not that the film has none.
+    """
     directors: [Person!]!
+
+    """
+    The cast on record: each entry links a person to the character they
+    played. Empty when no cast has been recorded.
+    """
     cast: [MovieCast!]!
+
+    """
+    User-submitted reviews for this movie, newest first. An empty list means
+    no reviews exist; reviews are public and reading them requires no
+    authentication. Each review carries an integer `score` from 1 to 10.
+    """
     reviews: [Review!]!
-    """Number of reviews - resolved as a grouped COUNT via @BatchMapping"""
+
+    """
+    Number of reviews on record for this movie. Always present; zero means
+    no reviews exist.
+    """
     reviewCount: Int!
 }
 
@@ -220,8 +293,28 @@ type Mutation {
     """Delete a review (owner or admin only)"""
     deleteReview(id: ID!): DeleteReviewResponse!
 
-    """Add a movie or TV show to the signed-in user's watch list."""
-    addToWatchlist(subject: WatchlistSubjectInput!, status: WatchStatus): WatchlistItem!
+    """
+    Adds a movie or TV show to the signed-in user's watch list and returns the
+    created entry.
+
+    Duplicate contract: each user can hold a given title at most once, enforced
+    by the database. Calling this for a title already on the list changes
+    nothing and fails with a BAD_REQUEST error whose message says the title is
+    already in the watch list. Agents should treat that specific error as
+    confirmation that the goal state already holds, not as a failure to report
+    or retry.
+
+    When `status` is omitted, the entry is created as WANT_TO_WATCH.
+    """
+    addToWatchlist(
+        """
+        The title to add. The input is @oneOf: provide exactly one of `movieId`
+        or `tvShowId`, enforced by the type system before any resolver runs.
+        """
+        subject: WatchlistSubjectInput!,
+        """Initial status for the new entry. Defaults to WANT_TO_WATCH when omitted."""
+        status: WatchStatus
+    ): WatchlistItem!
     """Change a watch-list entry's status, e.g. mark it watched."""
     setWatchStatus(itemId: ID!, status: WatchStatus!): WatchlistItem!
     """Remove an entry from the watch list."""
@@ -352,13 +445,19 @@ type TvShowPage {
 
 """A single entry in a user's watch list: a movie or a show, plus its status."""
 type WatchlistItem {
+    """The entry's own identifier, distinct from the movie or show it points at. Pass this to setWatchStatus and removeFromWatchlist."""
     id: ID!
+    """The saved title, movie or TV show, exposed through the shared Content interface."""
     content: Content!
+    """Where the entry stands: still planned (WANT_TO_WATCH) or already seen (WATCHED)."""
     status: WatchStatus!
 }
 
+"""Lifecycle status of a watch-list entry."""
 enum WatchStatus {
+    """On the list, not yet seen. The default for new entries."""
     WANT_TO_WATCH
+    """The user has seen it; the entry remains on the list as a record rather than a plan."""
     WATCHED
 }
 
@@ -424,47 +523,121 @@ type DeleteReviewResponse {
 
 extend type Query {
     """
-    Recommends movies that fit a given mood. Suitable for low-stakes recommendation
-    flows where an agent is asking on behalf of a user. Results are deterministic
-    within a 60-second window so an agent that retries does not see the catalog
-    shuffle under it.
+    Recommends up to ten movies that fit a given mood for the current user,
+    if authenticated; the operation also works for anonymous callers.
+    Suitable for low-stakes recommendation flows ("I want something fun tonight")
+    where the user benefits from a curated suggestion rather than an exhaustive
+    search. Results are deterministic within a sixty-second sliding window,
+    so an agent that retries within that window sees the same ordering and does
+    not need to reason about result drift. Returns an empty list (never null)
+    when the catalog does not contain any matches for the mood; an empty list
+    is a valid answer, not a failure.
     """
     recommendMoviesForMood(
+        """
+        The mood to recommend for. Required. The set is bounded by design;
+        if the desired mood is not in the list, the agent should pick the
+        closest available value rather than supplying a free-text hint.
+        """
         mood: Mood!,
+        """
+        When true, omits any movie the authenticated user has marked WATCHED
+        on their watch list. Defaults to false. For anonymous callers the flag
+        is a no-op: there is no watch list to exclude against, and the
+        operation succeeds rather than failing.
+        """
         excludeWatched: Boolean = false
     ): [Movie!]!
 }
 
 """
-Available mood categories. Bounded by design so an agent cannot supply free-text
-moods that would force fuzzy matching on the server. Add a new value here and
-update the recommendation engine in the same change.
+Available mood categories. Bounded by design so an agent cannot supply
+free-text moods that would force fuzzy matching on the server. Add a
+new value here and update the recommendation engine in the same change;
+unannotated values are a maintenance hazard.
 """
 enum Mood {
+    """
+    Familiar, low-stakes films the viewer has likely seen before and would
+    watch again on a rainy Sunday. Warm tone, broad humor, predictable
+    resolutions. The "rainy Sunday" mood.
+    """
     COMFORT,
+
+    """High-energy action, exploration, or quest arcs. Propulsive pacing, clear stakes. Pure fear belongs to HORROR."""
     ADVENTURE,
+
+    """Films whose spine is a romantic relationship, regardless of surrounding genre. Excludes films where romance is only a subplot."""
     ROMANCE,
+
+    """Films aiming to frighten through atmosphere, suspense, or shock. Includes psychological and supernatural horror. Investigative thrillers belong elsewhere."""
     HORROR,
+
+    """
+    Films that reward attention and reflection: character studies, slow
+    cinema, philosophical science fiction, morally ambiguous dramas. Expect
+    a longer post-watch conversation than COMFORT; pick this when the user
+    wants something to think about, not unwind to.
+    """
     THOUGHTFUL,
+
+    """Films whose primary aim is laughter. Spans broad, romantic, satirical, and absurdist comedy. Excludes dramas with comic relief."""
     COMEDIC
 }
 
 extend type Query {
     """
-    Returns a structured summary of user reviews for a movie. The summary is
-    generated server-side. Returns null when there are not enough reviews to
-    generate a meaningful summary (currently five). Agents should treat null
-    as "not enough data," not "no reviews exist."
+    Returns a structured summary of user reviews for a given movie, computed
+    server-side from the underlying review corpus (integer scores from 1 to 10
+    plus free-text comments). The summary includes an overall sentiment label,
+    recurring themes pulled from the review text, and the timestamp at which
+    the summary was generated.
+
+    Returns null in exactly one circumstance: when there are reviews but fewer
+    than five of them, the system has insufficient material to produce a
+    meaningful summary. In that case the agent should treat the result as
+    "not enough data," not as "no reviews exist" and not as a failure.
+
+    When there are zero reviews, the operation still returns a non-null
+    `MovieReviewSummary` whose `reviewCount` is zero and whose `themes` list
+    is empty, so the agent can distinguish "no reviews exist" from "fewer than
+    five reviews exist" by inspecting the result shape rather than by guessing
+    from null alone. In the zero-review shape, `overallSentiment` carries no
+    signal and is reported as `MIXED`.
     """
-    summarizeMovieReviews(movieId: ID!): MovieReviewSummary
+    summarizeMovieReviews(
+        """
+        The id of the movie whose reviews should be summarized. Must reference
+        an existing movie; unknown ids produce a NOT_FOUND error rather than
+        returning null, so null cannot be confused with a bad id.
+        """
+        movieId: ID!
+    ): MovieReviewSummary
 }
 
+"""
+A server-computed snapshot of a movie's review corpus. Immutable once
+generated; `generatedAt` says when.
+"""
 type MovieReviewSummary {
+    """The id of the summarized movie, echoing the operation's argument."""
     movieId: ID!
+    """Number of reviews the summary was computed from. Zero means no reviews exist."""
     reviewCount: Int!
+    """Overall sentiment label derived from the integer 1-to-10 review scores. Reported as MIXED when reviewCount is zero, where it carries no signal."""
     overallSentiment: Sentiment!
+    """Recurring themes pulled from the review text. Empty when reviewCount is zero."""
     themes: [String!]!
+    """Timestamp at which the summary was generated, in UTC."""
     generatedAt: DateTime!
 }
 
-enum Sentiment { POSITIVE, MIXED, NEGATIVE }
+"""Overall sentiment of a review corpus, derived from the 1-to-10 scores."""
+enum Sentiment {
+    """Reviews skew clearly favorable."""
+    POSITIVE
+    """Reviews split, or there is no signal to report (zero reviews)."""
+    MIXED
+    """Reviews skew clearly unfavorable."""
+    NEGATIVE
+}

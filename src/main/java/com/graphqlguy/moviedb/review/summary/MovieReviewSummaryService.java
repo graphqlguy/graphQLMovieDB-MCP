@@ -1,5 +1,7 @@
 package com.graphqlguy.moviedb.review.summary;
 
+import com.graphqlguy.moviedb.exception.EntityNotFoundException;
+import com.graphqlguy.moviedb.movie.MovieRepository;
 import com.graphqlguy.moviedb.review.Review;
 import com.graphqlguy.moviedb.review.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +19,17 @@ public class MovieReviewSummaryService {
     private static final int MIN_REVIEWS_FOR_SUMMARY = 5;
 
     private final ReviewRepository reviewRepository;
+    private final MovieRepository movieRepository;
 
     public MovieReviewSummary summarize(Long movieId) {
+        if (!movieRepository.existsById(movieId)) {
+            throw new EntityNotFoundException("Movie", movieId);
+        }
         List<Review> reviews = reviewRepository.findByMovieIdOrderByCreatedAtDesc(movieId);
+        if (reviews.isEmpty()) {
+            return new MovieReviewSummary(
+                movieId, 0, Sentiment.MIXED, List.of(), OffsetDateTime.now());
+        }
         if (reviews.size() < MIN_REVIEWS_FOR_SUMMARY) {
             return null;
         }
