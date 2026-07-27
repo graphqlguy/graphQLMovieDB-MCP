@@ -1,0 +1,67 @@
+package com.graphqlguy.moviedb.mcp;
+
+import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.spec.McpSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.mcp.annotation.provider.tool.SyncMcpToolProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+
+/**
+ * Class 8: the third registration route. We run the annotation scanner's own
+ * machinery (SyncMcpToolProvider) by hand, rewrite each tool's description
+ * from the GraphQL schema, and contribute the result as the bean the
+ * auto-configuration registers. The annotation scanner itself is disabled in
+ * application.yaml so every tool registers exactly once.
+ */
+@Configuration
+public class SchemaDescriptionToolSpecifications {
+
+    private static final Logger log =
+        LoggerFactory.getLogger(SchemaDescriptionToolSpecifications.class);
+
+    @Bean
+    public List<McpServerFeatures.SyncToolSpecification> schemaDescribedTools(
+            MovieMcpTools movieMcpTools,
+            HelloMcpTool helloMcpTool,
+            SchemaDescriptionProvider descriptions) {
+
+        List<McpServerFeatures.SyncToolSpecification> scanned =
+            new SyncMcpToolProvider(List.of(movieMcpTools, helloMcpTool))
+                .getToolSpecifications();
+
+        return scanned.stream()
+            .map(spec -> withSchemaDescription(spec, descriptions))
+            .toList();
+    }
+
+    private McpServerFeatures.SyncToolSpecification withSchemaDescription(
+            McpServerFeatures.SyncToolSpecification spec,
+            SchemaDescriptionProvider descriptions) {
+
+        McpSchema.Tool tool = spec.tool();
+
+        String description = descriptions.describe(tool.name()).orElseGet(() -> {
+            log.warn("No schema description for tool '{}'; falling back to the annotation description.",
+                tool.name());
+            return tool.description();
+        });
+
+        McpSchema.Tool rewritten = McpSchema.Tool.builder(tool.name(), tool.inputSchema())
+            .title(tool.title())
+            .description(description)
+            .outputSchema(tool.outputSchema())
+            .annotations(tool.annotations())
+            .icons(tool.icons())
+            .meta(tool.meta())
+            .build();
+
+        return McpServerFeatures.SyncToolSpecification.builder()
+            .tool(rewritten)
+            .callHandler(spec.callHandler())
+            .build();
+    }
+}
