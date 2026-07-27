@@ -8,8 +8,10 @@ import com.graphqlguy.moviedb.recommendation.Mood;
 import com.graphqlguy.moviedb.review.summary.Sentiment;
 import com.graphqlguy.moviedb.watchlist.WatchStatus;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
+import org.springframework.ai.mcp.annotation.McpProgressToken;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
+import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
@@ -143,16 +145,30 @@ public class MovieMcpTools {
         )
     )
     public MovieReviewSummary summarizeMovieReviews(
+            // Class 10: both special parameters are filled in by the framework
+            // and never appear in the tool's input schema. context.progress(...)
+            // reads the client's token on its own and quietly does nothing when
+            // the client did not send one.
+            McpSyncRequestContext context,
+            @McpProgressToken String progressToken,
             @McpToolParam(description = "Movie ID, as it appears in the schema.", required = true)
             String movieId) {
+
+        context.progress(p -> p.progress(0.0).total(1.0).message("Loading reviews"));
 
         ExecutionGraphQlResponse response = executeOperation(
             "SummarizeMovieReviews",
             MovieOperations.SUMMARIZE_MOVIE_REVIEWS,
             Map.of("movieId", movieId));
 
+        context.progress(p -> p.progress(0.4).total(1.0).message("Summarizing"));
+
         Object value = response.field("summarizeMovieReviews").getValue();
-        return objectMapper.convertValue(value, MovieReviewSummary.class);
+        MovieReviewSummary summary = objectMapper.convertValue(value, MovieReviewSummary.class);
+
+        context.progress(p -> p.progress(1.0).total(1.0).message("Done"));
+
+        return summary;
     }
 
     @McpTool(
