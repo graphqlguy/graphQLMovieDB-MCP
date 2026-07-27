@@ -1,0 +1,21 @@
+# Class 19: stdio transport profile for local clients (Claude Desktop, Claude
+# Code). Activate with --spring.profiles.active=stdio. web-application-type none
+# binds no ports so the only IO is stdin/stdout; banner-mode off keeps the Spring
+# banner off stdout, which is the JSON-RPC protocol channel and must stay clean.
+# stdio: true enables the stdio transport (a separate property from protocol).
+# show-sql stays off here so Hibernate never writes SQL to stdout.
+spring:
+  main:
+    web-application-type: none
+    banner-mode: off
+  jpa:
+    show-sql: false
+  ai:
+    mcp:
+      server:
+        name: moviedb-mcp-stdio
+        version: 1.0.0
+        type: SYNC
+        stdio: true
+        capabilities:
+          tool: true

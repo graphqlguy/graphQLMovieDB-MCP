@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Class 19: for the stdio profile only. stdout carries the JSON-RPC framing, so
+  every log line must go to stderr instead. Activate with
+  -Dlogging.config=classpath:logback-stdio.xml when running the stdio profile;
+  leave the production logback-spring.xml untouched for HTTP mode.
+-->
+<configuration>
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="STDERR"/>
+    </root>
+</configuration>
