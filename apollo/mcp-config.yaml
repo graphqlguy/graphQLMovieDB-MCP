@@ -14,5 +14,14 @@ operations:
   paths:
     - ./operations
 
+custom_scalars: ./custom-scalars.json
+
+# Local-development shortcut (Class 5): pass the caller's bearer token straight
+# through to Spring so its JWT filter and @PreAuthorize rules keep working.
+# Anywhere beyond your laptop, prefer the transport.auth resource-server block
+# (see mcp-config.yaml comments in the chapter and the Apollo auth docs).
+forward_headers:
+  - authorization
+
 overrides:
   mutation_mode: explicit

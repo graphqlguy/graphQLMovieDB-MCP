@@ -1,3 +1,8 @@
+# Recommend movies for the user's current mood.
+# Use this when the user asks for something to watch and provides a mood
+# or sentiment word (cozy, exciting, scary, etc.). Map their phrasing to the
+# closest Mood value before calling. Returns up to ten matches; if none fit,
+# the result is empty rather than null.
 query RecommendMoviesForMood($mood: Mood!, $excludeWatched: Boolean = false) {
   recommendMoviesForMood(mood: $mood, excludeWatched: $excludeWatched) {
     id

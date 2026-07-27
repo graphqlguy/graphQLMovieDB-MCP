@@ -1,3 +1,8 @@
+# Summarize user reviews for a specific movie.
+# Use this only after the user has identified a movie they care about; do not
+# call it speculatively across many movies. Returns null when fewer than five
+# reviews exist, which the user should be told about as "not enough reviews
+# yet" rather than as failure.
 query SummarizeMovieReviews($movieId: ID!) {
   summarizeMovieReviews(movieId: $movieId) {
     movieId

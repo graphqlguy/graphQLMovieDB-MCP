@@ -1,0 +1,11 @@
+# Class 5: Apollo Contracts example. Targets the `support` contract variant of
+# the moviedb graph in GraphOS; both the uplink schema and the GraphOS-managed
+# operations are fetched for that variant. Requires a GraphOS account and a
+# published contract; shown here as the per-agent schema-view pattern.
+endpoint: http://localhost:8080/graphql
+graphos:
+  apollo_graph_ref: moviedb@support
+schema:
+  source: uplink
+operations:
+  source: uplink

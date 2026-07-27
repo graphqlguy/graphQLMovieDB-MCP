@@ -1,3 +1,9 @@
+# Add a movie or TV show to the signed-in user's watch list.
+# Provide exactly one of subject.movieId or subject.tvShowId. Omit status
+# unless the user says they have already seen the title; the server defaults
+# to WANT_TO_WATCH. Not idempotent: adding a title that is already on the
+# list fails with a validation error, so never retry a call that succeeded,
+# and treat an "already in your watch list" error as success, not failure.
 mutation AddToWatchlist($subject: WatchlistSubjectInput!, $status: WatchStatus) {
   addToWatchlist(subject: $subject, status: $status) {
     id

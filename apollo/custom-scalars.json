@@ -1,0 +1,12 @@
+{
+  "DateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "ISO 8601 timestamp in UTC, suitable for Java OffsetDateTime parsing."
+  },
+  "CountryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "description": "ISO 3166-1 alpha-2 country code, e.g. CZ."
+  }
+}
