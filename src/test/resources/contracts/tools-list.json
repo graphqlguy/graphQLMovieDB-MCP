@@ -1,0 +1,113 @@
+[ {
+  "name" : "addToWatchlist",
+  "title" : "Add To Watchlist",
+  "description" : "Adds a movie or TV show to the signed-in user's watch list and returns the\ncreated entry.\n\nDuplicate contract: each user can hold a given title at most once, enforced\nby the database. Calling this for a title already on the list changes\nnothing and fails with a BAD_REQUEST error whose message says the title is\nalready in the watch list. Agents should treat that specific error as\nconfirmation that the goal state already holds, not as a failure to report\nor retry.\n\nWhen `status` is omitted, the entry is created as WANT_TO_WATCH.",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "subject" : {
+        "type" : "object",
+        "properties" : {
+          "movieId" : {
+            "type" : "string"
+          },
+          "tvShowId" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "movieId", "tvShowId" ],
+        "description" : "The title to add: exactly one of movieId or tvShowId."
+      },
+      "status" : {
+        "type" : "string",
+        "enum" : [ "WANT_TO_WATCH", "WATCHED" ],
+        "description" : "Optional initial status, WANT_TO_WATCH or WATCHED. Omit for the default WANT_TO_WATCH."
+      }
+    },
+    "required" : [ "subject" ]
+  },
+  "annotations" : {
+    "title" : "Add To Watchlist",
+    "readOnlyHint" : false,
+    "destructiveHint" : false,
+    "idempotentHint" : true,
+    "openWorldHint" : false
+  }
+}, {
+  "name" : "recommendMoviesForMood",
+  "title" : "Recommend Movies For Mood",
+  "description" : "Recommends up to ten movies that fit a given mood for the current user,\nif authenticated; the operation also works for anonymous callers.\nSuitable for low-stakes recommendation flows (\"I want something fun tonight\")\nwhere the user benefits from a curated suggestion rather than an exhaustive\nsearch. Results are deterministic within a sixty-second sliding window,\nso an agent that retries within that window sees the same ordering and does\nnot need to reason about result drift. Returns an empty list (never null)\nwhen the catalog does not contain any matches for the mood; an empty list\nis a valid answer, not a failure.",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "input" : {
+        "type" : "object",
+        "properties" : {
+          "excludeWatched" : {
+            "type" : "boolean"
+          },
+          "mood" : {
+            "type" : "string",
+            "enum" : [ "COMFORT", "ADVENTURE", "ROMANCE", "HORROR", "THOUGHTFUL", "COMEDIC" ]
+          }
+        },
+        "required" : [ "excludeWatched", "mood" ],
+        "description" : "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDIC) and an optional excludeWatched flag, default false, which filters out movies the signed-in user has already marked WATCHED on their watchlist."
+      }
+    },
+    "required" : [ "input" ]
+  },
+  "annotations" : {
+    "title" : "Recommend Movies For Mood",
+    "readOnlyHint" : true,
+    "destructiveHint" : false,
+    "idempotentHint" : true,
+    "openWorldHint" : false
+  }
+}, {
+  "name" : "summarizeMovieReviews",
+  "title" : "Summarize Movie Reviews",
+  "description" : "Returns a structured summary of user reviews for a given movie, computed\nserver-side from the underlying review corpus (integer scores from 1 to 10\nplus free-text comments). The summary includes an overall sentiment label,\nrecurring themes pulled from the review text, and the timestamp at which\nthe summary was generated.\n\nReturns null in exactly one circumstance: when there are reviews but fewer\nthan five of them, the system has insufficient material to produce a\nmeaningful summary. In that case the agent should treat the result as\n\"not enough data,\" not as \"no reviews exist\" and not as a failure.\n\nWhen there are zero reviews, the operation still returns a non-null\n`MovieReviewSummary` whose `reviewCount` is zero and whose `themes` list\nis empty, so the agent can distinguish \"no reviews exist\" from \"fewer than\nfive reviews exist\" by inspecting the result shape rather than by guessing\nfrom null alone. In the zero-review shape, `overallSentiment` carries no\nsignal and is reported as `MIXED`.",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "movieId" : {
+        "type" : "string",
+        "description" : "Movie ID, as it appears in the schema."
+      }
+    },
+    "required" : [ "movieId" ]
+  },
+  "annotations" : {
+    "title" : "Summarize Movie Reviews",
+    "readOnlyHint" : true,
+    "destructiveHint" : false,
+    "idempotentHint" : true,
+    "openWorldHint" : false
+  }
+}, {
+  "name" : "ping",
+  "title" : "ping",
+  "description" : "Smoke-test tool. Returns a greeting that echoes the supplied name. Used during Class 6 to verify the MCP server wiring before real tools are added in Class 7.",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "name" : {
+        "type" : "string",
+        "description" : "Name to greet. Any non-empty string."
+      }
+    },
+    "required" : [ "name" ]
+  },
+  "annotations" : {
+    "title" : "",
+    "readOnlyHint" : false,
+    "destructiveHint" : true,
+    "idempotentHint" : false,
+    "openWorldHint" : true
+  }
+} ]
