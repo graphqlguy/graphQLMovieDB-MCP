@@ -7,8 +7,10 @@ import tools.jackson.databind.ObjectMapper;
 import com.graphqlguy.moviedb.recommendation.Mood;
 import com.graphqlguy.moviedb.review.summary.Sentiment;
 import com.graphqlguy.moviedb.watchlist.WatchStatus;
+import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
 import org.springframework.graphql.ExecutionGraphQlService;
@@ -33,10 +35,23 @@ public class MovieMcpTools {
 
     private final ExecutionGraphQlService graphql;
     private final ObjectMapper objectMapper;
+    private final ToolResults toolResults;
 
-    public MovieMcpTools(ExecutionGraphQlService graphql, ObjectMapper objectMapper) {
+    @Autowired
+    public MovieMcpTools(ExecutionGraphQlService graphql, ObjectMapper objectMapper, ToolResults toolResults) {
         this.graphql = graphql;
         this.objectMapper = objectMapper;
+        this.toolResults = toolResults;
+    }
+
+    // Convenience constructors used by unit tests: a real ObjectMapper and a
+    // ToolResults built on it are cheap and exercise the production paths.
+    public MovieMcpTools(ExecutionGraphQlService graphql, ObjectMapper objectMapper) {
+        this(graphql, objectMapper, new ToolResults(objectMapper));
+    }
+
+    public MovieMcpTools(ExecutionGraphQlService graphql) {
+        this(graphql, new ObjectMapper());
     }
 
     public record RecommendInput(
@@ -158,7 +173,7 @@ public class MovieMcpTools {
             openWorldHint = false
         )
     )
-    public WatchlistItemSummary addToWatchlist(
+    public CallToolResult addToWatchlist(
             @McpToolParam(description = "The title to add: exactly one of movieId or tvShowId.", required = true)
             WatchlistSubject subject,
             @McpToolParam(description = "Optional initial status, WANT_TO_WATCH or WATCHED. Omit for the default WANT_TO_WATCH.", required = false)
@@ -181,28 +196,36 @@ public class MovieMcpTools {
             variables.put("status", status.name());
         }
 
-        ExecutionGraphQlResponse response = executeOperation(
+        // Class 9: execute leniently and let ToolResults decide how the outcome
+        // reaches the agent (isError, structuredContent, compatibility text).
+        ExecutionGraphQlResponse response = executeOperationLenient(
             "AddToWatchlist",
             MovieOperations.ADD_TO_WATCHLIST,
             variables);
 
-        Object value = response.field("addToWatchlist").getValue();
-        return objectMapper.convertValue(value, WatchlistItemSummary.class);
+        return toolResults.toCallResult(response, "addToWatchlist");
     }
 
-    // Fail fast: throw a runtime exception when the response has errors and let
-    // the MCP runtime wrap it as a tool error. Class 9 replaces this policy with
-    // the structured mapping in ToolResults.
+    // Fail fast (Class 7 policy, kept for the read tools): throw a runtime
+    // exception when the response has errors and let the MCP runtime wrap it as
+    // a tool error.
     private ExecutionGraphQlResponse executeOperation(
             String operationName, String document, Map<String, Object> variables) {
-        ExecutionGraphQlRequest request = new DefaultExecutionGraphQlRequest(
-                document, operationName, variables, Map.of(),
-                UUID.randomUUID().toString(), null);
-        ExecutionGraphQlResponse response = graphql.execute(request).block();
+        ExecutionGraphQlResponse response = executeOperationLenient(operationName, document, variables);
         if (response != null && response.getErrors() != null && !response.getErrors().isEmpty()) {
             throw new IllegalStateException(
                 "GraphQL execution returned errors: " + response.getErrors());
         }
         return response;
+    }
+
+    // Class 9: no error policy of its own; the caller routes the response
+    // through ToolResults.toCallResult.
+    private ExecutionGraphQlResponse executeOperationLenient(
+            String operationName, String document, Map<String, Object> variables) {
+        ExecutionGraphQlRequest request = new DefaultExecutionGraphQlRequest(
+                document, operationName, variables, Map.of(),
+                UUID.randomUUID().toString(), null);
+        return graphql.execute(request).block();
     }
 }

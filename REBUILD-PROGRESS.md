@@ -7,3 +7,4 @@ class 5 done: apollo/ extended (custom-scalars.json, forward_headers dev shortcu
 class 6 done: spring-ai-bom 2.0.0 + spring-ai-starter-mcp-server-webmvc, application.yaml SYNC/STREAMABLE + capabilities block, HelloMcpTool ping smoke test; compile OK
 class 7 done: MovieOperations constants + MovieMcpTools with three @McpTool methods (records nested; fail-fast executeOperation); NOTE Boot 4 = Jackson 3, ObjectMapper imports are tools.jackson.* not com.fasterxml.*; compile + context boot OK
 class 8 done: SchemaDescriptionProvider + SchemaDescriptionToolSpecifications (SyncMcpToolProvider rerun, Tool rebuilt with schema description), annotation-scanner disabled; boot shows the single expected ping fallback warning
+class 9 done: ToolResults (structuredContent + text compat + isError, classification promoted), addToWatchlist returns CallToolResult via executeOperationLenient; reads stay typed (deviation from ch09 last paragraph, required by ch10-12/15 listings); boot OK
