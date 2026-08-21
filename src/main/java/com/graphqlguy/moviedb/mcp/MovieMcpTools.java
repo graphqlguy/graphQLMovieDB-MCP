@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class 7: each curated GraphQL operation becomes one @McpTool method. Every
@@ -86,9 +87,12 @@ public class MovieMcpTools {
             OffsetDateTime generatedAt
     ) {}
 
+    // @Nullable on both components keeps them out of the generated schema's
+    // required list; the exactly-one rule is enforced by GraphQL's @oneOf and
+    // advertised in the tool description.
     public record WatchlistSubject(
-            String movieId,
-            String tvShowId
+            @Nullable String movieId,
+            @Nullable String tvShowId
     ) {}
 
     public record AddedContent(String title) {}
