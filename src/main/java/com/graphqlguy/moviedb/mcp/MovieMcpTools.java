@@ -95,7 +95,7 @@ public class MovieMcpTools {
     )
     public List<MovieSummary> recommendMoviesForMood(
             @McpToolParam(
-                description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDIC) and an optional excludeWatched flag, default false, which filters out movies the signed-in user has already marked WATCHED on their watchlist.",
+                description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDIC) and an excludeWatched flag, which the input schema requires on every call. Send false unless the user wants movies they have already marked WATCHED on their watchlist filtered out.",
                 required = true
             )
             RecommendInput input) {
