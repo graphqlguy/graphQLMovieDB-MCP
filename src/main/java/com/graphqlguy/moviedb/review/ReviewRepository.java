@@ -19,14 +19,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             from Review r where r.movie.id in :movieIds group by r.movie.id""")
     List<MovieReviewCount> countByMovieIdIn(@Param("movieIds") List<Long> movieIds);
 
-    // Class 2: single-movie lookup for the review summary. A review targets either
-    // a movie or a TV show; filtering on the movie relation means TV-show reviews
-    // simply never match.
-    List<Review> findByMovieIdOrderByCreatedAtDesc(Long movieId);
-
     boolean existsByMovieIdAndUserId(Long movieId, Long userId);
 
     void deleteByMovieId(Long movieId);
 
     boolean existsByTvShowIdAndUserId(Long tvShowId, Long userId);
+
+    List<Review> findByMovieIdOrderByCreatedAtDesc(Long movieId);
 }

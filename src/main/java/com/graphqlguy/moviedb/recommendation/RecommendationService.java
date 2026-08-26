@@ -30,12 +30,12 @@ public class RecommendationService {
         Set<Long> excludedMovieIds = watchedMovieIds(excludeWatched, viewer);
         long windowSeed = Instant.now().getEpochSecond() / 60;
         Comparator<Movie> stableShuffle = Comparator.comparingInt(
-            m -> Long.hashCode(m.getId() ^ windowSeed));
+                m -> Long.hashCode(m.getId() ^ windowSeed));
         return movieRepository.findAll().stream()
-            .filter(m -> !excludedMovieIds.contains(m.getId()))
-            .sorted(stableShuffle)
-            .limit(10)
-            .toList();
+                .filter(m -> !excludedMovieIds.contains(m.getId()))
+                .sorted(stableShuffle)
+                .limit(10)
+                .toList();
     }
 
     private Set<Long> watchedMovieIds(boolean excludeWatched, AppUser viewer) {
@@ -46,8 +46,8 @@ public class RecommendationService {
             return Set.of();
         }
         return watchlistRepository.findWithContentByUserId(viewer.getId()).stream()
-            .filter(item -> item.getStatus() == WatchStatus.WATCHED && item.getMovie() != null)
-            .map(item -> item.getMovie().getId())
-            .collect(Collectors.toSet());
+                .filter(item -> item.getStatus() == WatchStatus.WATCHED && item.getMovie() != null)
+                .map(item -> item.getMovie().getId())
+                .collect(Collectors.toSet());
     }
 }

@@ -27,7 +27,49 @@ type Query {
     tvShows(page: Int = 0 @Range(min: 0), size: Int = 10 @Range(min: 1, max: 100)): TvShowPage!
     """The signed-in user's watch list."""
     watchlist: [WatchlistItem!]!
+    """
+    Recommends movies that fit a given mood. Suitable for low-stakes recommendation
+    flows where an agent is asking on behalf of a user. Results are deterministic
+    within a 60-second window so an agent that retries does not see the catalog
+    shuffle under it.
+    """
+    recommendMoviesForMood(
+        mood: Mood!
+        excludeWatched: Boolean = false
+    ): [Movie!]!
+
+    """
+    Returns a structured summary of user reviews for a movie. The summary is
+    generated server-side. Returns null when there are fewer than five
+    reviews. Agents should treat null as "not enough data," not as "no reviews
+    exist."
+    """
+    summarizeMovieReviews(movieId: ID!): MovieReviewSummary
 }
+
+"""
+Available mood categories. Bounded by design so an agent cannot supply free-text
+moods that would force fuzzy matching on the server. Add a new value here and
+update the recommendation engine in the same change.
+"""
+enum Mood {
+    COMFORT
+    ADVENTURE
+    ROMANCE
+    HORROR
+    THOUGHTFUL
+    COMEDY
+}
+
+type MovieReviewSummary {
+    movieId: ID!
+    reviewCount: Int!
+    overallSentiment: Sentiment!
+    themes: [String!]!
+    generatedAt: DateTime!
+}
+
+enum Sentiment { POSITIVE, MIXED, NEGATIVE }
 
 """Union of Movie and Person for cross-type search"""
 union SearchResult = Movie | Person | TvShow
@@ -417,54 +459,3 @@ type DeleteReviewResponse {
     """ID of the deleted review, or null if nothing was deleted."""
     deletedId: ID
 }
-
-# ---------------------------------------------------------------------------
-# Agent-facing operations (GraphQL + MCP tutorial, Class 2)
-# ---------------------------------------------------------------------------
-
-extend type Query {
-    """
-    Recommends movies that fit a given mood. Suitable for low-stakes recommendation
-    flows where an agent is asking on behalf of a user. Results are deterministic
-    within a 60-second window so an agent that retries does not see the catalog
-    shuffle under it.
-    """
-    recommendMoviesForMood(
-        mood: Mood!,
-        excludeWatched: Boolean = false
-    ): [Movie!]!
-}
-
-"""
-Available mood categories. Bounded by design so an agent cannot supply free-text
-moods that would force fuzzy matching on the server. Add a new value here and
-update the recommendation engine in the same change.
-"""
-enum Mood {
-    COMFORT,
-    ADVENTURE,
-    ROMANCE,
-    HORROR,
-    THOUGHTFUL,
-    COMEDIC
-}
-
-extend type Query {
-    """
-    Returns a structured summary of user reviews for a movie. The summary is
-    generated server-side. Returns null when there are not enough reviews to
-    generate a meaningful summary (currently five). Agents should treat null
-    as "not enough data," not "no reviews exist."
-    """
-    summarizeMovieReviews(movieId: ID!): MovieReviewSummary
-}
-
-type MovieReviewSummary {
-    movieId: ID!
-    reviewCount: Int!
-    overallSentiment: Sentiment!
-    themes: [String!]!
-    generatedAt: DateTime!
-}
-
-enum Sentiment { POSITIVE, MIXED, NEGATIVE }

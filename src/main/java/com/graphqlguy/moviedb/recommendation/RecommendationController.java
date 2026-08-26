@@ -20,10 +20,10 @@ public class RecommendationController {
 
     @QueryMapping
     List<Movie> recommendMoviesForMood(
-        @Argument Mood mood,
-        @Argument boolean excludeWatched,
-        Principal principal
-    ) {
+            @Argument Mood mood,
+            @Argument boolean excludeWatched,
+            Principal principal) {
+
         AppUser viewer = resolveViewer(principal);
         return recommendationService.recommendForMood(mood, excludeWatched, viewer);
     }

@@ -25,11 +25,10 @@ public class MovieReviewSummaryService {
         }
         // Stub summary. A later class wires this to a real summarizer.
         return new MovieReviewSummary(
-            movieId,
-            reviews.size(),
-            Sentiment.MIXED,
-            List.of("placeholder theme"),
-            OffsetDateTime.now()
-        );
+                movieId,
+                reviews.size(),
+                Sentiment.MIXED,
+                List.of("placeholder theme"),
+                OffsetDateTime.now());
     }
 }

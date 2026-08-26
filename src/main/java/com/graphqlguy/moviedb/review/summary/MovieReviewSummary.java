@@ -4,9 +4,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 public record MovieReviewSummary(
-    Long movieId,
-    int reviewCount,
-    Sentiment overallSentiment,
-    List<String> themes,
-    OffsetDateTime generatedAt
+        Long movieId,
+        int reviewCount,
+        Sentiment overallSentiment,
+        List<String> themes,
+        OffsetDateTime generatedAt
 ) {}
