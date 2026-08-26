@@ -27,6 +27,61 @@ type Query {
     tvShows(page: Int = 0 @Range(min: 0), size: Int = 10 @Range(min: 1, max: 100)): TvShowPage!
     """The signed-in user's watch list."""
     watchlist: [WatchlistItem!]!
+
+    """
+    Recommends up to ten movies that fit a given mood for the current user,
+    if authenticated; the operation also works for anonymous callers.
+    Suitable for low-stakes recommendation flows ("I want something fun tonight")
+    where the user benefits from a curated suggestion rather than an exhaustive
+    search. Results are deterministic within a sixty-second sliding window,
+    so an agent that retries within that window sees the same ordering and does
+    not need to reason about result drift. Returns an empty list (never null)
+    when the catalog does not contain any matches for the mood; an empty list
+    is a valid answer, not a failure.
+    """
+    recommendMoviesForMood(
+        """
+        The mood to recommend for. Required. The set is bounded by design;
+        if the desired mood is not in the list, the agent should pick the
+        closest available value rather than supplying a free-text hint.
+        """
+        mood: Mood!,
+        """
+        When true, omits any movie the authenticated user has marked WATCHED
+        on their watch list. Defaults to false. For anonymous callers the flag
+        is a no-op: there is no watch list to exclude against, and the
+        operation succeeds rather than failing.
+        """
+        excludeWatched: Boolean = false
+    ): [Movie!]!
+
+    """
+    Returns a structured summary of user reviews for a given movie, computed
+    server-side from the underlying review corpus (integer scores from 1 to 10
+    plus free-text comments). The summary includes an overall sentiment label,
+    recurring themes pulled from the review text, and the timestamp at which
+    the summary was generated.
+
+    Returns null in exactly one circumstance: when there are reviews but fewer
+    than five of them, the system has insufficient material to produce a
+    meaningful summary. In that case the agent should treat the result as
+    "not enough data," not as "no reviews exist" and not as a failure.
+
+    When there are zero reviews, the operation still returns a non-null
+    `MovieReviewSummary` whose `reviewCount` is zero and whose `themes` list
+    is empty, so the agent can distinguish "no reviews exist" from "fewer than
+    five reviews exist" by inspecting the result shape rather than by guessing
+    from null alone. In the zero-review shape, `overallSentiment` carries no
+    signal and is reported as `MIXED`.
+    """
+    summarizeMovieReviews(
+        """
+        The id of the movie whose reviews should be summarized. Must reference
+        an existing movie; unknown ids produce a NOT_FOUND error rather than
+        returning null, so null cannot be confused with a bad id.
+        """
+        movieId: ID!
+    ): MovieReviewSummary
 }
 
 """Union of Movie and Person for cross-type search"""
@@ -521,35 +576,6 @@ type DeleteReviewResponse {
 # Agent-facing operations (GraphQL + MCP tutorial, Class 2)
 # ---------------------------------------------------------------------------
 
-extend type Query {
-    """
-    Recommends up to ten movies that fit a given mood for the current user,
-    if authenticated; the operation also works for anonymous callers.
-    Suitable for low-stakes recommendation flows ("I want something fun tonight")
-    where the user benefits from a curated suggestion rather than an exhaustive
-    search. Results are deterministic within a sixty-second sliding window,
-    so an agent that retries within that window sees the same ordering and does
-    not need to reason about result drift. Returns an empty list (never null)
-    when the catalog does not contain any matches for the mood; an empty list
-    is a valid answer, not a failure.
-    """
-    recommendMoviesForMood(
-        """
-        The mood to recommend for. Required. The set is bounded by design;
-        if the desired mood is not in the list, the agent should pick the
-        closest available value rather than supplying a free-text hint.
-        """
-        mood: Mood!,
-        """
-        When true, omits any movie the authenticated user has marked WATCHED
-        on their watch list. Defaults to false. For anonymous callers the flag
-        is a no-op: there is no watch list to exclude against, and the
-        operation succeeds rather than failing.
-        """
-        excludeWatched: Boolean = false
-    ): [Movie!]!
-}
-
 """
 Available mood categories. Bounded by design so an agent cannot supply
 free-text moods that would force fuzzy matching on the server. Add a
@@ -582,37 +608,7 @@ enum Mood {
     THOUGHTFUL,
 
     """Films whose primary aim is laughter. Spans broad, romantic, satirical, and absurdist comedy. Excludes dramas with comic relief."""
-    COMEDIC
-}
-
-extend type Query {
-    """
-    Returns a structured summary of user reviews for a given movie, computed
-    server-side from the underlying review corpus (integer scores from 1 to 10
-    plus free-text comments). The summary includes an overall sentiment label,
-    recurring themes pulled from the review text, and the timestamp at which
-    the summary was generated.
-
-    Returns null in exactly one circumstance: when there are reviews but fewer
-    than five of them, the system has insufficient material to produce a
-    meaningful summary. In that case the agent should treat the result as
-    "not enough data," not as "no reviews exist" and not as a failure.
-
-    When there are zero reviews, the operation still returns a non-null
-    `MovieReviewSummary` whose `reviewCount` is zero and whose `themes` list
-    is empty, so the agent can distinguish "no reviews exist" from "fewer than
-    five reviews exist" by inspecting the result shape rather than by guessing
-    from null alone. In the zero-review shape, `overallSentiment` carries no
-    signal and is reported as `MIXED`.
-    """
-    summarizeMovieReviews(
-        """
-        The id of the movie whose reviews should be summarized. Must reference
-        an existing movie; unknown ids produce a NOT_FOUND error rather than
-        returning null, so null cannot be confused with a bad id.
-        """
-        movieId: ID!
-    ): MovieReviewSummary
+    COMEDY
 }
 
 """
