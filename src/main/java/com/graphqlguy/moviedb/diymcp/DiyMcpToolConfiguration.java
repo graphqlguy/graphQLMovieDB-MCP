@@ -36,7 +36,7 @@ public class DiyMcpToolConfiguration {
             {
               "type": "object",
               "properties": {
-                "mood": {"type": "string", "enum": ["COMFORT","ADVENTURE","ROMANCE","HORROR","THOUGHTFUL","COMEDIC"]},
+                "mood": {"type": "string", "enum": ["COMFORT","ADVENTURE","ROMANCE","HORROR","THOUGHTFUL","COMEDY"]},
                 "excludeWatched": {"type": "boolean"}
               },
               "required": ["mood"]
