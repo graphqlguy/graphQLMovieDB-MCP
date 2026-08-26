@@ -6,5 +6,5 @@ public enum Mood {
     ROMANCE,
     HORROR,
     THOUGHTFUL,
-    COMEDIC
+    COMEDY
 }

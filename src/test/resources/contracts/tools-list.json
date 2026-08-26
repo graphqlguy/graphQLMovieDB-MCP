@@ -50,11 +50,11 @@
           },
           "mood" : {
             "type" : "string",
-            "enum" : [ "COMFORT", "ADVENTURE", "ROMANCE", "HORROR", "THOUGHTFUL", "COMEDIC" ]
+            "enum" : [ "COMFORT", "ADVENTURE", "ROMANCE", "HORROR", "THOUGHTFUL", "COMEDY" ]
           }
         },
         "required" : [ "excludeWatched", "mood" ],
-        "description" : "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDIC) and an optional excludeWatched flag, default false, which filters out movies the signed-in user has already marked WATCHED on their watchlist."
+        "description" : "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDY) and an optional excludeWatched flag, default false, which filters out movies the signed-in user has already marked WATCHED on their watchlist."
       }
     },
     "required" : [ "input" ]
