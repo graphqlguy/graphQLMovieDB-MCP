@@ -27,6 +27,12 @@ export default function MovieDetailPage() {
   });
   const [deleteMovie] = useMutation(docs.DELETE_MOVIE ?? NOOP);
 
+  const { data: summaryData } = useQuery(docs.MOVIE_REVIEW_SUMMARY ?? NOOP, {
+    variables: { movieId: id },
+    skip: !docs.MOVIE_REVIEW_SUMMARY,
+  });
+  const reviewSummary = summaryData?.summarizeMovieReviews;
+
   // Before the security class exists there is no login, so everyone may admin.
   const canAdmin = isAdmin || !docs.LOGIN;
 
@@ -204,6 +210,30 @@ export default function MovieDetailPage() {
           )}
         </div>
       </div>
+
+      {reviewSummary && (
+        <div className="mt-10">
+          <h2 className="text-zinc-400 text-sm uppercase tracking-wider font-semibold mb-3">
+            What Reviewers Say
+          </h2>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+            {reviewSummary.summary ? (
+              <p className="text-zinc-300 leading-relaxed">{reviewSummary.summary}</p>
+            ) : (
+              <p className="text-zinc-500 leading-relaxed">
+                {reviewSummary.reviewCount === 0
+                  ? 'No reviews yet.'
+                  : `Only ${reviewSummary.reviewCount} review${reviewSummary.reviewCount === 1 ? '' : 's'} so far, too few to summarize.`}
+              </p>
+            )}
+            {reviewSummary.averageScore != null && (
+              <p className="text-zinc-500 text-sm mt-3">
+                Average score {reviewSummary.averageScore.toFixed(1)} from {reviewSummary.reviewCount} review{reviewSummary.reviewCount === 1 ? '' : 's'}.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {caps.field('Movie', 'reviews') && (
         <ReviewSection
