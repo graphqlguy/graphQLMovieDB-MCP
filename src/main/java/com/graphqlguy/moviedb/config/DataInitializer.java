@@ -62,6 +62,26 @@ public class DataInitializer {
                 .password(passwordEncoder.encode("admin123")).role(Role.ADMIN).build());
             AppUser user = userRepo.save(AppUser.builder().username("user").email("user@moviedb.com")
                 .password(passwordEncoder.encode("user123")).role(Role.USER).build());
+            AppUser mara    = userRepo.save(AppUser.builder().username("mara").email("mara@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser petra   = userRepo.save(AppUser.builder().username("petra").email("petra@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser dan     = userRepo.save(AppUser.builder().username("dan").email("dan@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser ines    = userRepo.save(AppUser.builder().username("ines").email("ines@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser tomas   = userRepo.save(AppUser.builder().username("tomas").email("tomas@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser sofia   = userRepo.save(AppUser.builder().username("sofia").email("sofia@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser henrik  = userRepo.save(AppUser.builder().username("henrik").email("henrik@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser lucia   = userRepo.save(AppUser.builder().username("lucia").email("lucia@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser noor    = userRepo.save(AppUser.builder().username("noor").email("noor@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+            AppUser viktor  = userRepo.save(AppUser.builder().username("viktor").email("viktor@example.com")
+                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
 
             // ── Persons (directors) ───────────────────────────────────────
             Person christopherNolan = personRepo.save(Person.builder().name("Christopher Nolan").birthYear(1970).countryCode("GB")
@@ -298,6 +318,56 @@ public class DataInitializer {
                     .biography("Action legend and former California governor.").photoUrl(BASE + "dgCABuZp2HBehCT84O4WBp7KIoe.jpg").build());
             Person aneurinBarnard = personRepo.save(Person.builder().name("Aneurin Barnard").birthYear(1987).countryCode("GB")
                     .biography("Welsh actor known for Dunkirk and War & Peace.").photoUrl(BASE + "aiuFLvyaxmuglNi3nfQ3oL9qW97.jpg").build());
+            Person haroldRamis = personRepo.save(Person.builder().name("Harold Ramis").birthYear(1944).countryCode("US")
+                    .biography("Director of Groundhog Day and Caddyshack.").photoUrl(BASE + "kmTMTxthkDAsygk3Am4IUSVYYRi.jpg").build());
+            Person wesAnderson = personRepo.save(Person.builder().name("Wes Anderson").birthYear(1969).countryCode("US")
+                    .biography("Director known for a meticulously symmetrical visual style.").photoUrl(BASE + "s03CeUeC5yAXyB1acqP0zGNo2SC.jpg").build());
+            Person billyWilder = personRepo.save(Person.builder().name("Billy Wilder").birthYear(1906).countryCode("AT")
+                    .biography("Director of Some Like It Hot and Sunset Boulevard.").photoUrl(BASE + "nWV9BDDCbRegP7etiPjl3vYnJEq.jpg").build());
+            Person damienChazelle = personRepo.save(Person.builder().name("Damien Chazelle").birthYear(1985).countryCode("US")
+                    .biography("Director of La La Land and Whiplash.").photoUrl(BASE + "14kRZ3XxNMyBv717YQSXr3wCucy.jpg").build());
+            Person michelGondry = personRepo.save(Person.builder().name("Michel Gondry").birthYear(1963).countryCode("FR")
+                    .biography("Director known for a handmade, surreal visual style.").photoUrl(BASE + "4U9DhwQtrs2UUFPya2ixaYh091i.jpg").build());
+            Person robReiner = personRepo.save(Person.builder().name("Rob Reiner").birthYear(1947).countryCode("US")
+                    .biography("Director of When Harry Met Sally and Stand by Me.").photoUrl(BASE + "rcmPU3YlhHQVzZlV197qhmRsgEL.jpg").build());
+            Person jordanPeele = personRepo.save(Person.builder().name("Jordan Peele").birthYear(1979).countryCode("US")
+                    .biography("Director of Get Out and Us.").photoUrl(BASE + "kFUKn5g3ebpyZ3CSZZZo2HFWRNQ.jpg").build());
+            Person ariAster = personRepo.save(Person.builder().name("Ari Aster").birthYear(1986).countryCode("US")
+                    .biography("Director of Hereditary and Midsommar.").photoUrl(BASE + "45lOHyHwdMgyKm6u3jwLtyfwOjc.jpg").build());
+            Person billMurray = personRepo.save(Person.builder().name("Bill Murray").birthYear(1950).countryCode("US")
+                    .biography("Deadpan comic actor known for Groundhog Day and Ghostbusters.").photoUrl(BASE + "nnCsJc9x3ZiG3AFyiyc3FPehppy.jpg").build());
+            Person andieMacDowell = personRepo.save(Person.builder().name("Andie MacDowell").birthYear(1958).countryCode("US")
+                    .biography("Known for Groundhog Day and Four Weddings and a Funeral.").photoUrl(BASE + "akeheO4i3cR1HpSU8yu9HrLcsKm.jpg").build());
+            Person ralphFiennes = personRepo.save(Person.builder().name("Ralph Fiennes").birthYear(1962).countryCode("GB")
+                    .biography("Known for The Grand Budapest Hotel and Schindler's List.").photoUrl(BASE + "tJr9GcmGNHhLVVEH3i7QYbj6hBi.jpg").build());
+            Person tonyRevolori = personRepo.save(Person.builder().name("Tony Revolori").birthYear(1996).countryCode("US")
+                    .biography("Known for The Grand Budapest Hotel.").photoUrl(BASE + "tSF6XmXDikrKZbFUeoDnafXxKjT.jpg").build());
+            Person marilynMonroe = personRepo.save(Person.builder().name("Marilyn Monroe").birthYear(1926).countryCode("US")
+                    .biography("Screen icon known for Some Like It Hot.").photoUrl(BASE + "vcp6rHL2sZWdlJQDEWsEe0jAAe1.jpg").build());
+            Person tonyCurtis = personRepo.save(Person.builder().name("Tony Curtis").birthYear(1925).countryCode("US")
+                    .biography("Known for Some Like It Hot and Spartacus.").photoUrl(BASE + "6Pj1XkYdI5Wc40Jl0UxJk8PPwlY.jpg").build());
+            Person jackLemmon = personRepo.save(Person.builder().name("Jack Lemmon").birthYear(1925).countryCode("US")
+                    .biography("Known for Some Like It Hot and The Apartment.").photoUrl(BASE + "7jWVWLr1VJqQrN3d4YJaATCIHRw.jpg").build());
+            Person ryanGosling = personRepo.save(Person.builder().name("Ryan Gosling").birthYear(1980).countryCode("CA")
+                    .biography("Known for La La Land and Blade Runner 2049.").photoUrl(BASE + "lyUyVARQKhGxaxy0FbPJCQRpiaW.jpg").build());
+            Person emmaStone = personRepo.save(Person.builder().name("Emma Stone").birthYear(1988).countryCode("US")
+                    .biography("Known for La La Land and Poor Things.").photoUrl(BASE + "t7EYLBMWQiIDtCoOYZjvqXV84S5.jpg").build());
+            Person jimCarrey = personRepo.save(Person.builder().name("Jim Carrey").birthYear(1962).countryCode("CA")
+                    .biography("Known for Eternal Sunshine of the Spotless Mind and The Truman Show.").photoUrl(BASE + "y3U9QfPN6sJaGl6l68xjwWj28ig.jpg").build());
+            Person kateWinslet = personRepo.save(Person.builder().name("Kate Winslet").birthYear(1975).countryCode("GB")
+                    .biography("Known for Eternal Sunshine of the Spotless Mind and Titanic.").photoUrl(BASE + "6qNnMsKtKz9si5rabpUEG85UfHp.jpg").build());
+            Person billyCrystal = personRepo.save(Person.builder().name("Billy Crystal").birthYear(1948).countryCode("US")
+                    .biography("Known for When Harry Met Sally.").photoUrl(BASE + "jfcCceTnP7rrHz1pSjCxiqRosw3.jpg").build());
+            Person megRyan = personRepo.save(Person.builder().name("Meg Ryan").birthYear(1961).countryCode("US")
+                    .biography("Known for When Harry Met Sally and Sleepless in Seattle.").photoUrl(BASE + "pxfTSfJ4yJWq52uomSWKzigngOa.jpg").build());
+            Person danielKaluuya = personRepo.save(Person.builder().name("Daniel Kaluuya").birthYear(1989).countryCode("GB")
+                    .biography("Known for Get Out and Black Panther.").photoUrl(BASE + "jj2kZqJobjom36wlhlYhc38nTwN.jpg").build());
+            Person allisonWilliams = personRepo.save(Person.builder().name("Allison Williams").birthYear(1988).countryCode("US")
+                    .biography("Known for Get Out and Girls.").photoUrl(BASE + "5Jy9HELKS1OYg7moRl8870OSfJq.jpg").build());
+            Person toniCollette = personRepo.save(Person.builder().name("Toni Collette").birthYear(1972).countryCode("AU")
+                    .biography("Known for Hereditary and The Sixth Sense.").photoUrl(BASE + "lzXRh16qe4HHeBN6tMyw0DHvaMn.jpg").build());
+            Person alexWolff = personRepo.save(Person.builder().name("Alex Wolff").birthYear(1997).countryCode("US")
+                    .biography("Known for Hereditary.").photoUrl(BASE + "7PMu5zFOEH7PqFDzrKThgKD4Ndf.jpg").build());
 
             // ── Movies ────────────────────────────────────────────────────
 
@@ -369,6 +439,23 @@ public class DataInitializer {
                     .posterUrl(BASE + "ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg").tmdbId(299534).build(),
                 List.of(anthonyRusso, joeRusso),
                 List.of(new CastEntry(scarlettJohansson, "Natasha Romanoff"), new CastEntry(chadwickBoseman, "T'Challa")));
+
+            // COMEDY
+            Movie groundhogDay = saveMovie(Movie.builder().title("Groundhog Day").releaseYear(1993).genre(Genre.COMEDY).rating(7.6).runtime(101)
+                    .plot("A cynical weatherman is trapped reliving the same day in a small town, forced to confront who he really is.")
+                    .posterUrl(BASE + "gCgt1WARPZaXnq523ySQEUKinCs.jpg").tmdbId(137).build(),
+                List.of(haroldRamis),
+                List.of(new CastEntry(billMurray, "Phil Connors"), new CastEntry(andieMacDowell, "Rita Hanson")));
+            saveMovie(Movie.builder().title("The Grand Budapest Hotel").releaseYear(2014).genre(Genre.COMEDY).rating(8.1).runtime(99)
+                    .plot("A legendary concierge and his loyal lobby boy become entangled in a theft and murder investigation at a famous European hotel.")
+                    .posterUrl(BASE + "eWdyYQreja6JGCzqHWXpWHDrrPo.jpg").tmdbId(120467).build(),
+                List.of(wesAnderson),
+                List.of(new CastEntry(ralphFiennes, "M. Gustave"), new CastEntry(tonyRevolori, "Zero Moustafa")));
+            saveMovie(Movie.builder().title("Some Like It Hot").releaseYear(1959).genre(Genre.COMEDY).rating(8.2).runtime(121)
+                    .plot("Two musicians who witness a mob hit disguise themselves as women to join an all-female band fleeing to Florida.")
+                    .posterUrl(BASE + "hVIKyTK13AvOGv7ICmJjK44DTzp.jpg").tmdbId(239).build(),
+                List.of(billyWilder),
+                List.of(new CastEntry(marilynMonroe, "Sugar Kane Kowalczyk"), new CastEntry(tonyCurtis, "Joe"), new CastEntry(jackLemmon, "Jerry")));
 
             // SCI-FI
             saveMovie(Movie.builder().title("The Terminator").releaseYear(1984).genre(Genre.SCIFI).rating(8.1).runtime(107)
@@ -540,6 +627,16 @@ public class DataInitializer {
                     .posterUrl(BASE + "yz4QVqPx3h1hD1DfqqQkCq3rmxW.jpg").tmdbId(539).build(),
                 List.of(alfredHitchcock),
                 List.of(new CastEntry(anthonyPerkins, "Norman Bates"), new CastEntry(janetLeigh, "Marion Crane")));
+            saveMovie(Movie.builder().title("Get Out").releaseYear(2017).genre(Genre.HORROR).rating(7.7).runtime(104)
+                    .plot("A young man uncovers a disturbing secret when he meets his girlfriend's seemingly welcoming family.")
+                    .posterUrl(BASE + "tFXcEccSQMf3lfhfXKSU9iRBpa3.jpg").tmdbId(419430).build(),
+                List.of(jordanPeele),
+                List.of(new CastEntry(danielKaluuya, "Chris Washington"), new CastEntry(allisonWilliams, "Rose Armitage")));
+            saveMovie(Movie.builder().title("Hereditary").releaseYear(2018).genre(Genre.HORROR).rating(7.1).runtime(127)
+                    .plot("A family unravels after the death of their secretive grandmother reveals a sinister inheritance.")
+                    .posterUrl(BASE + "4GFPuL14eXi66V96xBWY73Y9PfR.jpg").tmdbId(493922).build(),
+                List.of(ariAster),
+                List.of(new CastEntry(toniCollette, "Annie Graham"), new CastEntry(alexWolff, "Peter Graham")));
 
             // ROMANCE
             saveMovie(Movie.builder().title("Casablanca").releaseYear(1942).genre(Genre.ROMANCE).rating(8.5).runtime(102)
@@ -547,6 +644,21 @@ public class DataInitializer {
                     .posterUrl(BASE + "lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg").tmdbId(289).build(),
                 List.of(michaelCurtiz),
                 List.of(new CastEntry(humphreyBogart, "Rick Blaine"), new CastEntry(ingridBergman, "Ilsa Lund")));
+            Movie laLaLand = saveMovie(Movie.builder().title("La La Land").releaseYear(2016).genre(Genre.ROMANCE).rating(7.9).runtime(128)
+                    .plot("A jazz pianist and an aspiring actress fall in love while pursuing their dreams in Los Angeles.")
+                    .posterUrl(BASE + "uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg").tmdbId(313369).build(),
+                List.of(damienChazelle),
+                List.of(new CastEntry(ryanGosling, "Sebastian"), new CastEntry(emmaStone, "Mia")));
+            saveMovie(Movie.builder().title("Eternal Sunshine of the Spotless Mind").releaseYear(2004).genre(Genre.ROMANCE).rating(8.3).runtime(108)
+                    .plot("A heartbroken man undergoes a procedure to erase memories of his ex-girlfriend, only to relive their relationship in reverse.")
+                    .posterUrl(BASE + "5MwkWH9tYHv3mV9OdYTMR5qreIz.jpg").tmdbId(38).build(),
+                List.of(michelGondry),
+                List.of(new CastEntry(jimCarrey, "Joel Barish"), new CastEntry(kateWinslet, "Clementine Kruczynski")));
+            saveMovie(Movie.builder().title("When Harry Met Sally").releaseYear(1989).genre(Genre.ROMANCE).rating(7.6).runtime(96)
+                    .plot("Two friends spend over a decade debating whether men and women can truly stay just friends.")
+                    .posterUrl(BASE + "rFOiFUhTMtDetqCGClC9PIgnC1P.jpg").tmdbId(639).build(),
+                List.of(robReiner),
+                List.of(new CastEntry(billyCrystal, "Harry Burns"), new CastEntry(megRyan, "Sally Albright")));
 
             // WAR
             saveMovie(Movie.builder().title("Dunkirk").releaseYear(2017).genre(Genre.WAR).rating(7.9).runtime(106)
@@ -735,14 +847,75 @@ public class DataInitializer {
 
             // ── Reviews (max one per user per title) ──────────────────────
             reviewRepo.saveAll(List.of(
+                // The Shawshank Redemption: 8 reviews, recurring themes (hope, slow first hour, narration)
                 Review.builder().user(admin).movie(shawshank).score(10)
-                    .comment("Unbelievable that this movie didn't get a single Oscar.").build(),
-                Review.builder().user(user).movie(godfather).score(10)
-                    .comment("An offer you can't refuse.").build(),
+                    .comment("The slow first hour is the whole point. By the time the tunnel appears you have lived every year with him, and the payoff lands because it was earned instead of staged.").build(),
+                Review.builder().user(henrik).movie(shawshank).score(9)
+                    .comment("Freeman's narration carries this. Without it the middle stretch would drag, and with it the prison feels like somewhere you have actually been.").build(),
+                Review.builder().user(mara).movie(shawshank).score(10)
+                    .comment("A film about hope that never once feels sentimental. The first hour is deliberately patient and I understand why some find it slow.").build(),
+                Review.builder().user(petra).movie(shawshank).score(8)
+                    .comment("Beautifully made, though the pacing in the first act tested me on rewatch. The narration is what pulls it through.").build(),
+                Review.builder().user(dan).movie(shawshank).score(10)
+                    .comment("Hope is the subject and the structure. Everything in the first hour is setup for a payoff that would not work without it.").build(),
+                Review.builder().user(ines).movie(shawshank).score(9)
+                    .comment("Freeman narrating a story that is not about him is the trick that makes it work. Slow to start and worth the patience.").build(),
+                Review.builder().user(tomas).movie(shawshank).score(9)
+                    .comment("The prison feels lived in. It takes its time, sometimes too much, but the ending is one of the few that genuinely earns its optimism.").build(),
+                Review.builder().user(sofia).movie(shawshank).score(10)
+                    .comment("I put off watching it for years because of the reputation. The reputation is correct. Hope, patience, and a narrator who knows exactly when to stop talking.").build(),
+
+                // Inception: 6 reviews, recurring themes (the ending, the score, practical effects)
                 Review.builder().user(admin).movie(inception).score(9)
-                    .comment("Still arguing about the ending.").build(),
+                    .comment("Still arguing about the ending a decade later, which is either the point or the flaw depending on your mood. The score does an enormous amount of the work.").build(),
+                Review.builder().user(mara).movie(inception).score(8)
+                    .comment("The rotating corridor is practical and you can feel it. The ending is a cheap trick that I nonetheless think about constantly.").build(),
+                Review.builder().user(dan).movie(inception).score(9)
+                    .comment("Zimmer's score is the reason the last forty minutes work. The exposition in the first act is heavy, and the ambiguity at the end is the right call.").build(),
+                Review.builder().user(henrik).movie(inception).score(7)
+                    .comment("Too much of the first hour is characters explaining rules to each other. The practical effects and the score carry it past that.").build(),
+                Review.builder().user(lucia).movie(inception).score(9)
+                    .comment("The spinning top is not the interesting question. The score, the corridor fight, and the pacing of the final act are.").build(),
+                Review.builder().user(noor).movie(inception).score(8)
+                    .comment("Front-loaded with exposition and worth it. The practical corridor sequence still looks better than most digital work since.").build(),
+
+                // The Matrix: 5 reviews, recurring themes (bullet time, ageing, the sequels)
                 Review.builder().user(user).movie(theMatrix).score(9)
-                    .comment("Aged remarkably well.").build(),
+                    .comment("Aged remarkably well. Bullet time became a joke through imitation, but in the original it is used sparingly and it still reads as new.").build(),
+                Review.builder().user(petra).movie(theMatrix).score(9)
+                    .comment("The world building is tighter than I remembered. Try to ignore that the sequels exist and it is close to perfect.").build(),
+                Review.builder().user(tomas).movie(theMatrix).score(8)
+                    .comment("Bullet time is the thing everyone remembers and the practical stunt work is what actually holds up.").build(),
+                Review.builder().user(viktor).movie(theMatrix).score(10)
+                    .comment("Twenty-five years on and the first act still works as pure mystery. The sequels do not diminish it.").build(),
+                Review.builder().user(sofia).movie(theMatrix).score(8)
+                    .comment("Some of the dialogue is very of its time. The action and the central idea have aged far better than the script.").build(),
+
+                // The Godfather: 2 reviews, deliberately below the summary threshold
+                Review.builder().user(user).movie(godfather).score(10)
+                    .comment("An offer you cannot refuse, and a first hour of wedding scenes that teaches you every family relationship you need for the next two.").build(),
+                Review.builder().user(ines).movie(godfather).score(9)
+                    .comment("The lighting alone is worth it. Slow in the middle and the ending justifies every minute.").build(),
+
+                // Groundhog Day: 4 reviews, recurring themes (the loop as a growth device, Murray's tonal shift)
+                Review.builder().user(henrik).movie(groundhogDay).score(8)
+                    .comment("The premise could have stayed a gimmick. Instead the loop becomes the character's growth arc, and Murray plays the shift from cynical to decent without losing the deadpan.").build(),
+                Review.builder().user(lucia).movie(groundhogDay).score(9)
+                    .comment("Murray sells every stage of the loop, from denial to boredom to something close to grace, and the comic tone stays intact through all of it.").build(),
+                Review.builder().user(noor).movie(groundhogDay).score(8)
+                    .comment("A comedy about repetition that earns its warmth by the end. Rita's patience with the town is what the loop is actually testing in Phil.").build(),
+                Review.builder().user(viktor).movie(groundhogDay).score(9)
+                    .comment("The structure is simple and the execution is not. Each pass through the day adds one more detail to Phil's arc, until the change feels inevitable instead of forced.").build(),
+
+                // La La Land: 3 reviews, recurring themes (the bittersweet ending, the score, the leads' chemistry)
+                Review.builder().user(mara).movie(laLaLand).score(8)
+                    .comment("The ending is the whole movie in miniature: bittersweet and honestly ambiguous about whether the dream was worth the choice. Gosling and Stone sell every beat of it.").build(),
+                Review.builder().user(petra).movie(laLaLand).score(8)
+                    .comment("The score does as much storytelling as the dialogue, especially in the closing sequence where the two of them imagine the life they did not choose.").build(),
+                Review.builder().user(dan).movie(laLaLand).score(9)
+                    .comment("Gosling and Stone have the kind of chemistry that makes the ending land instead of feel like a downer, and the jazz numbers are where the film is most alive.").build(),
+
+                // TV shows keep their original single reviews
                 Review.builder().user(admin).tvShow(friends).score(8)
                     .comment("Comfort TV at its finest.").build(),
                 Review.builder().user(user).tvShow(seinfeld).score(9)
