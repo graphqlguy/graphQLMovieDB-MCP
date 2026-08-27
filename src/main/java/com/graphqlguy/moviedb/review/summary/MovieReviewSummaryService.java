@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -16,10 +15,10 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class MovieReviewSummaryService {
 
-    private static final int MIN_REVIEWS_FOR_SUMMARY = 5;
+    private static final int MIN_REVIEWS_FOR_SUMMARY = 3;
 
-    private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
+    private final ReviewRepository reviewRepository;
 
     public MovieReviewSummary summarize(Long movieId) {
         if (!movieRepository.existsById(movieId)) {
@@ -27,19 +26,18 @@ public class MovieReviewSummaryService {
         }
         List<Review> reviews = reviewRepository.findByMovieIdOrderByCreatedAtDesc(movieId);
         if (reviews.isEmpty()) {
-            return new MovieReviewSummary(
-                movieId, 0, Sentiment.MIXED, List.of(), OffsetDateTime.now());
+            return new MovieReviewSummary(movieId, 0, null, List.of(), null);
         }
+        double average = reviews.stream().mapToInt(Review::getScore).average().orElseThrow();
         if (reviews.size() < MIN_REVIEWS_FOR_SUMMARY) {
-            return null;
+            return new MovieReviewSummary(movieId, reviews.size(), null, List.of(), average);
         }
-        // Stub summary. A later class wires this to a real summarizer.
+        // Stub synthesis. Class 11 replaces this with MCP sampling against the client's model.
         return new MovieReviewSummary(
-            movieId,
-            reviews.size(),
-            Sentiment.MIXED,
-            List.of("placeholder theme"),
-            OffsetDateTime.now()
-        );
+                movieId,
+                reviews.size(),
+                "Reviewers broadly agree on this one; see the individual reviews for detail.",
+                List.of(),
+                average);
     }
 }
