@@ -19,7 +19,7 @@ public record MoodProfile(Set<Genre> genres, double minRating, Integer maxRuntim
         Mood.ROMANCE,    new MoodProfile(Set.of(Genre.ROMANCE, Genre.DRAMA), 6.5, null),
         Mood.HORROR,     new MoodProfile(Set.of(Genre.HORROR, Genre.THRILLER, Genre.MYSTERY), 6.0, null),
         Mood.THOUGHTFUL, new MoodProfile(Set.of(Genre.DRAMA, Genre.SCIFI, Genre.WAR, Genre.MYSTERY, Genre.CRIME), 7.5, null),
-        Mood.COMEDY,     new MoodProfile(Set.of(Genre.COMEDY, Genre.ROMANCE), 6.0, null));
+        Mood.COMEDY,     new MoodProfile(Set.of(Genre.COMEDY), 6.0, null));
 
     public static MoodProfile forMood(Mood mood) {
         return PROFILES.get(mood);
