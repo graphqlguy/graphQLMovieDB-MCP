@@ -19,6 +19,8 @@ const SORT_OPTIONS = [
 
 const PAGE_SIZE = 20;
 
+const MOODS = ['COMFORT', 'ADVENTURE', 'ROMANCE', 'HORROR', 'THOUGHTFUL', 'COMEDY'];
+
 export default function HomePage() {
   const { caps, docs } = useCaps();
   const [page, setPage] = useState(1);
@@ -27,6 +29,13 @@ export default function HomePage() {
   const [selectedGenre, setSelectedGenre] = useState('');
   const [sortIdx, setSortIdx] = useState(0);
   const [minRating, setMinRating] = useState('');
+  const [mood, setMood] = useState(MOODS[0]);
+
+  const { data: moodData } = useQuery(docs.MOOD_RECOMMENDATIONS ?? NOOP, {
+    variables: { mood, excludeWatched: false },
+    skip: !docs.MOOD_RECOMMENDATIONS,
+  });
+  const moodMovies = moodData?.recommendMoviesForMood ?? [];
 
   const sort = SORT_OPTIONS[sortIdx];
 
@@ -104,6 +113,37 @@ export default function HomePage() {
         </h1>
         <p className="text-zinc-400 text-lg">Search movies and people</p>
       </div>
+
+      {/* Mood picker (only once the recommender exists in the schema) */}
+      {docs.MOOD_RECOMMENDATIONS && (
+        <div className="mb-10">
+          <h2 className="text-zinc-400 text-sm uppercase tracking-wider font-semibold mb-3 text-center">
+            In the Mood For Something
+          </h2>
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            {MOODS.map(m => (
+              <button
+                key={m}
+                onClick={() => setMood(m)}
+                className={`text-xs px-3 py-1.5 rounded-full transition-colors font-medium ${
+                  mood === m
+                    ? 'bg-yellow-500 text-black'
+                    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                }`}
+              >
+                {m.charAt(0) + m.slice(1).toLowerCase()}
+              </button>
+            ))}
+          </div>
+          {moodMovies.length === 0 ? (
+            <p className="text-center text-zinc-500">No recommendations for this mood yet.</p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {moodMovies.map(movie => <MovieCard key={movie.id} movie={movie} />)}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Search (only once a search query exists in the schema) */}
       {docs.GLOBAL_SEARCH && (
