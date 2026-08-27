@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -24,16 +23,16 @@ public class RecommendationService {
     private final WatchlistItemRepository watchlistRepository;
 
     public List<Movie> recommendForMood(Mood mood, boolean excludeWatched, AppUser viewer) {
-        // The mood is accepted but not yet acted on: this stub returns the catalog
-        // reshuffled, deterministic within a 60-second window so a retrying agent
-        // sees the same order. A later class wires in a real recommender.
+        // Each mood maps to a genre set plus rating and runtime constraints in
+        // MoodProfile. Results rank by rating, highest first, with a stable
+        // tiebreak on id so the order does not change between calls.
+        MoodProfile profile = MoodProfile.forMood(mood);
         Set<Long> excludedMovieIds = watchedMovieIds(excludeWatched, viewer);
-        long windowSeed = Instant.now().getEpochSecond() / 60;
-        Comparator<Movie> stableShuffle = Comparator.comparingInt(
-                m -> Long.hashCode(m.getId() ^ windowSeed));
         return movieRepository.findAll().stream()
+                .filter(profile::matches)
                 .filter(m -> !excludedMovieIds.contains(m.getId()))
-                .sorted(stableShuffle)
+                .sorted(Comparator.comparingDouble(Movie::getRating).reversed()
+                        .thenComparing(Movie::getId))
                 .limit(10)
                 .toList();
     }
