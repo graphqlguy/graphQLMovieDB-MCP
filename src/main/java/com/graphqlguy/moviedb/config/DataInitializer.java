@@ -451,7 +451,7 @@ public class DataInitializer {
 
             // ACTION
             saveMovie(Movie.builder().title("Die Hard").releaseYear(1988).genre(Genre.ACTION).rating(8.2).runtime(132)
-                    .plot("High above the city of L.A. a team of terrorists has seized a building, taken hostages, and declared war. One man has manages to escape... An off-duty cop hiding somewhere inside. He's alone, tired... and the only chance anyone has got.")
+                    .plot("High above the city of L.A. a team of terrorists has seized a building, taken hostages, and declared war. One man manages to escape... An off-duty cop hiding somewhere inside. He's alone, tired... and the only chance anyone has got.")
                     .posterUrl(BASE + "7Bjd8kfmDSOzpmhySpEhkUyK2oH.jpg").tmdbId(562).build(),
                 List.of(johnMcTiernan),
                 List.of(new CastEntry(bruceWillis, "John McClane"), new CastEntry(alanRickman, "Hans Gruber")));
