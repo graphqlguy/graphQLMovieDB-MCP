@@ -89,6 +89,18 @@ export function buildDocuments(caps) {
     }
   ` : null;
 
+  const MOVIE_REVIEW_SUMMARY = caps.query('summarizeMovieReviews') ? gql`
+    query MovieReviewSummary($movieId: ID!) {
+      summarizeMovieReviews(movieId: $movieId) {
+        movieId
+        reviewCount
+        summary
+        themes
+        averageScore
+      }
+    }
+  ` : null;
+
   // ---- search -------------------------------------------------------------
 
   // Search person cards show name, photo, and country; the people page shows more.
@@ -289,7 +301,7 @@ export function buildDocuments(caps) {
   ` : null;
 
   return {
-    GET_MOVIES, GET_MOVIE, GLOBAL_SEARCH,
+    GET_MOVIES, GET_MOVIE, MOVIE_REVIEW_SUMMARY, GLOBAL_SEARCH,
     GET_PEOPLE, GET_PERSON,
     GET_TV_SHOWS, GET_TV_SHOW,
     TMDB_SEARCH,
