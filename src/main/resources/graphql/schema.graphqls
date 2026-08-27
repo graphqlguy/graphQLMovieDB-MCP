@@ -58,30 +58,30 @@ type Query {
     """
     Returns a structured summary of user reviews for a given movie, computed
     server-side from the underlying review corpus (integer scores from 1 to 10
-    plus free-text comments). The summary includes an overall sentiment label,
-    recurring themes pulled from the review text, and the timestamp at which
-    the summary was generated.
+    plus free-text comments). The summary includes a short prose synthesis of
+    what reviewers said and recurring themes pulled from the review text.
 
-    Returns null in exactly one circumstance: when there are reviews but fewer
-    than five of them, the system has insufficient material to produce a
-    meaningful summary. In that case the agent should treat the result as
-    "not enough data," not as "no reviews exist" and not as a failure.
+    Always returns a non-null `MovieReviewSummary` for a movie that exists;
+    unknown ids produce a NOT_FOUND error instead of a null result, so this
+    field never returns null. When there are fewer than three reviews, the
+    system has insufficient material to produce a meaningful `summary`, so
+    that field is null and the agent should read `reviewCount` to see how
+    many there were; `averageScore` is null only when `reviewCount` is zero.
 
-    When there are zero reviews, the operation still returns a non-null
-    `MovieReviewSummary` whose `reviewCount` is zero and whose `themes` list
-    is empty, so the agent can distinguish "no reviews exist" from "fewer than
-    five reviews exist" by inspecting the result shape rather than by guessing
-    from null alone. In the zero-review shape, `overallSentiment` carries no
-    signal and is reported as `MIXED`.
+    When there are zero reviews, the operation still returns a
+    `MovieReviewSummary` whose `reviewCount` is zero, whose `summary` and
+    `averageScore` are null, and whose `themes` list is empty, so the agent
+    can distinguish "no reviews exist" from "fewer than three reviews exist"
+    by inspecting the result shape instead of guessing from null alone.
     """
     summarizeMovieReviews(
         """
         The id of the movie whose reviews should be summarized. Must reference
-        an existing movie; unknown ids produce a NOT_FOUND error rather than
-        returning null, so null cannot be confused with a bad id.
+        an existing movie; unknown ids produce a NOT_FOUND error instead of a
+        null result, so this field never returns null.
         """
         movieId: ID!
-    ): MovieReviewSummary
+    ): MovieReviewSummary!
 }
 
 """Union of Movie and Person for cross-type search"""
@@ -612,28 +612,18 @@ enum Mood {
 }
 
 """
-A server-computed snapshot of a movie's review corpus. Immutable once
-generated; `generatedAt` says when.
+A structured summary of the user reviews for one movie, computed server-side
+from the review corpus.
 """
 type MovieReviewSummary {
     """The id of the summarized movie, echoing the operation's argument."""
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means no reviews exist."""
     reviewCount: Int!
-    """Overall sentiment label derived from the integer 1-to-10 review scores. Reported as MIXED when reviewCount is zero, where it carries no signal."""
-    overallSentiment: Sentiment!
+    """A short prose synthesis of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
+    summary: String
     """Recurring themes pulled from the review text. Empty when reviewCount is zero."""
     themes: [String!]!
-    """Timestamp at which the summary was generated, in UTC."""
-    generatedAt: DateTime!
-}
-
-"""Overall sentiment of a review corpus, derived from the 1-to-10 scores."""
-enum Sentiment {
-    """Reviews skew clearly favorable."""
-    POSITIVE
-    """Reviews split, or there is no signal to report (zero reviews)."""
-    MIXED
-    """Reviews skew clearly unfavorable."""
-    NEGATIVE
+    """Mean of the 1-to-10 review scores. Null only when reviewCount is zero."""
+    averageScore: Float
 }
