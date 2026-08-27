@@ -89,6 +89,14 @@ export function buildDocuments(caps) {
     }
   ` : null;
 
+  const MOOD_RECOMMENDATIONS = caps.query('recommendMoviesForMood') ? gql`
+    query MoodRecommendations($mood: Mood!, $excludeWatched: Boolean) {
+      recommendMoviesForMood(mood: $mood, excludeWatched: $excludeWatched) {
+        ${movieListFields}
+      }
+    }
+  ` : null;
+
   const MOVIE_REVIEW_SUMMARY = caps.query('summarizeMovieReviews') ? gql`
     query MovieReviewSummary($movieId: ID!) {
       summarizeMovieReviews(movieId: $movieId) {
@@ -301,7 +309,7 @@ export function buildDocuments(caps) {
   ` : null;
 
   return {
-    GET_MOVIES, GET_MOVIE, MOVIE_REVIEW_SUMMARY, GLOBAL_SEARCH,
+    GET_MOVIES, GET_MOVIE, MOOD_RECOMMENDATIONS, MOVIE_REVIEW_SUMMARY, GLOBAL_SEARCH,
     GET_PEOPLE, GET_PERSON,
     GET_TV_SHOWS, GET_TV_SHOW,
     TMDB_SEARCH,
