@@ -39,12 +39,15 @@ type Query {
     ): [Movie!]!
 
     """
-    Returns a structured summary of user reviews for a movie. The summary is
-    generated server-side. Returns null when there are fewer than five
-    reviews. Agents should treat null as "not enough data," not as "no reviews
-    exist."
+    Returns a summary of user reviews for a movie. Always returns a summary object
+    for a movie that exists; an unknown id produces a NOT_FOUND error. When the
+    movie has too few reviews to synthesize prose, `summary` is null and
+    `reviewCount` says how many there were.
     """
-    summarizeMovieReviews(movieId: ID!): MovieReviewSummary
+    summarizeMovieReviews(
+        """The id of the movie whose reviews should be summarized. Unknown ids produce a NOT_FOUND error."""
+        movieId: ID!
+    ): MovieReviewSummary!
 }
 
 """
@@ -61,15 +64,22 @@ enum Mood {
     COMEDY
 }
 
+"""
+A structured summary of the user reviews for one movie, computed server-side
+from the review corpus.
+"""
 type MovieReviewSummary {
+    """The id of the summarized movie, echoing the operation's argument. Present so the summary is self-describing when it travels as an MCP tool result."""
     movieId: ID!
+    """How many reviews this summary was computed from."""
     reviewCount: Int!
-    overallSentiment: Sentiment!
+    """A short prose synthesis of what reviewers said. Null when there are too few reviews to write one; read reviewCount to see how many there were."""
+    summary: String
+    """Recurring subjects across the reviews. Empty when none were identified."""
     themes: [String!]!
-    generatedAt: DateTime!
+    """Mean of the 1-to-10 review scores. Null until the movie has at least one review."""
+    averageScore: Float
 }
-
-enum Sentiment { POSITIVE, MIXED, NEGATIVE }
 
 """Union of Movie and Person for cross-type search"""
 union SearchResult = Movie | Person | TvShow
