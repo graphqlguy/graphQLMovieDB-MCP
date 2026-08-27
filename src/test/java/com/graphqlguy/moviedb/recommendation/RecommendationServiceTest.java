@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,5 +34,24 @@ class RecommendationServiceTest {
         assertThat(horror)
             .extracting(Movie::getGenre)
             .allMatch(MoodProfile.forMood(Mood.HORROR).genres()::contains);
+    }
+
+    @Test
+    void noTwoMoodsReturnTheSameResultList() {
+        Map<Mood, List<Movie>> resultsByMood = new EnumMap<>(Mood.class);
+        for (Mood mood : Mood.values()) {
+            resultsByMood.put(mood, service.recommendForMood(mood, false, null));
+        }
+
+        Mood[] moods = Mood.values();
+        for (int i = 0; i < moods.length; i++) {
+            for (int j = i + 1; j < moods.length; j++) {
+                Mood first = moods[i];
+                Mood second = moods[j];
+                assertThat(resultsByMood.get(first))
+                    .as("%s and %s should not return identical result lists", first, second)
+                    .isNotEqualTo(resultsByMood.get(second));
+            }
+        }
     }
 }
