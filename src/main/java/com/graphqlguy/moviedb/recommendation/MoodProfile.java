@@ -32,6 +32,6 @@ public record MoodProfile(Set<Genre> genres, double minRating, Integer maxRuntim
         if (movie.getRating() == null || movie.getRating() < minRating) {
             return false;
         }
-        return maxRuntime == null || movie.getRuntime() == null || movie.getRuntime() <= maxRuntime;
+        return maxRuntime == null || (movie.getRuntime() != null && movie.getRuntime() <= maxRuntime);
     }
 }
