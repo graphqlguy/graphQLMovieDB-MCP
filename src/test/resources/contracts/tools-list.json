@@ -34,6 +34,49 @@
     "openWorldHint" : false
   }
 }, {
+  "name" : "confirmAction",
+  "title" : "confirmAction",
+  "description" : "Execute a previously staged action by confirmation token. Single-use.\nTokens expire 60 seconds after staging.\n",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "confirmationToken" : {
+        "type" : "string"
+      }
+    },
+    "required" : [ "confirmationToken" ]
+  },
+  "annotations" : {
+    "title" : "",
+    "readOnlyHint" : false,
+    "destructiveHint" : true,
+    "idempotentHint" : false,
+    "openWorldHint" : true
+  }
+}, {
+  "name" : "ping",
+  "title" : "ping",
+  "description" : "Smoke-test tool. Returns a greeting that echoes the supplied name. Used during Class 6 to verify the MCP server wiring before real tools are added in Class 7.",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "name" : {
+        "type" : "string",
+        "description" : "Name to greet. Any non-empty string."
+      }
+    },
+    "required" : [ "name" ]
+  },
+  "annotations" : {
+    "title" : "",
+    "readOnlyHint" : false,
+    "destructiveHint" : true,
+    "idempotentHint" : false,
+    "openWorldHint" : true
+  }
+}, {
   "name" : "recommendMoviesForMood",
   "title" : "Recommend Movies For Mood",
   "description" : "Recommends up to ten movies that fit a given mood for the current user,\nif authenticated; the operation also works for anonymous callers.\nSuitable for low-stakes recommendation flows (\"I want something fun tonight\")\nwhere the user benefits from a curated suggestion instead of an exhaustive\nsearch. Results are ranked by rating, highest first, with a stable tiebreak\non id, so repeated calls return the same order; an agent that retries sees\nthe same ordering and does not need to reason about result drift. Returns\nan empty list (never null) when the catalog does not contain any matches\nfor the mood; an empty list is a valid answer, not a failure.",
@@ -66,49 +109,6 @@
     "openWorldHint" : false
   }
 }, {
-  "name" : "summarizeMovieReviews",
-  "title" : "Summarize Movie Reviews",
-  "description" : "Returns a structured summary of user reviews for a given movie, computed\nserver-side from the underlying review corpus (integer scores from 1 to 10\nplus free-text comments). The summary includes a short prose synthesis of\nwhat reviewers said and recurring themes pulled from the review text.\n\nAlways returns a non-null `MovieReviewSummary` for a movie that exists;\nunknown ids produce a NOT_FOUND error instead of a null result, so this\nfield never returns null. When there are fewer than three reviews, the\nsystem has insufficient material to produce a meaningful `summary`, so\nthat field is null and the agent should read `reviewCount` to see how\nmany there were; `averageScore` is null only when `reviewCount` is zero.\n\nWhen there are zero reviews, the operation still returns a\n`MovieReviewSummary` whose `reviewCount` is zero, whose `summary` and\n`averageScore` are null, and whose `themes` list is empty, so the agent\ncan distinguish \"no reviews exist\" from \"fewer than three reviews exist\"\nby inspecting the result shape instead of guessing from null alone.",
-  "inputSchema" : {
-    "$schema" : "https://json-schema.org/draft/2020-12/schema",
-    "type" : "object",
-    "properties" : {
-      "movieId" : {
-        "type" : "string",
-        "description" : "Movie ID, as it appears in the schema."
-      }
-    },
-    "required" : [ "movieId" ]
-  },
-  "annotations" : {
-    "title" : "Summarize Movie Reviews",
-    "readOnlyHint" : true,
-    "destructiveHint" : false,
-    "idempotentHint" : true,
-    "openWorldHint" : false
-  }
-}, {
-  "name" : "confirmAction",
-  "title" : "confirmAction",
-  "description" : "Execute a previously staged action by confirmation token. Single-use.\nTokens expire 60 seconds after staging.\n",
-  "inputSchema" : {
-    "$schema" : "https://json-schema.org/draft/2020-12/schema",
-    "type" : "object",
-    "properties" : {
-      "confirmationToken" : {
-        "type" : "string"
-      }
-    },
-    "required" : [ "confirmationToken" ]
-  },
-  "annotations" : {
-    "title" : "",
-    "readOnlyHint" : false,
-    "destructiveHint" : true,
-    "idempotentHint" : false,
-    "openWorldHint" : true
-  }
-}, {
   "name" : "stageRemoveFromWatchlist",
   "title" : "Stage Remove From Watchlist",
   "description" : "Stage removal of an item from the signed-in user's watch list.\nReturns a confirmation token. The actual removal only happens when\nthe user calls confirmAction with the returned token within\n60 seconds. Tokens are single-use.\n",
@@ -130,25 +130,25 @@
     "openWorldHint" : false
   }
 }, {
-  "name" : "ping",
-  "title" : "ping",
-  "description" : "Smoke-test tool. Returns a greeting that echoes the supplied name. Used during Class 6 to verify the MCP server wiring before real tools are added in Class 7.",
+  "name" : "summarizeMovieReviews",
+  "title" : "Summarize Movie Reviews",
+  "description" : "Returns a structured summary of user reviews for a given movie, computed\nserver-side from the underlying review corpus (integer scores from 1 to 10\nplus free-text comments). The summary includes a short prose synthesis of\nwhat reviewers said and recurring themes pulled from the review text.\n\nAlways returns a non-null `MovieReviewSummary` for a movie that exists;\nunknown ids produce a NOT_FOUND error instead of a null result, so this\nfield never returns null. When there are fewer than three reviews, the\nsystem has insufficient material to produce a meaningful `summary`, so\nthat field is null and the agent should read `reviewCount` to see how\nmany there were; `averageScore` is null only when `reviewCount` is zero.\n\nWhen there are zero reviews, the operation still returns a\n`MovieReviewSummary` whose `reviewCount` is zero, whose `summary` and\n`averageScore` are null, and whose `themes` list is empty, so the agent\ncan distinguish \"no reviews exist\" from \"fewer than three reviews exist\"\nby inspecting the result shape instead of guessing from null alone.",
   "inputSchema" : {
     "$schema" : "https://json-schema.org/draft/2020-12/schema",
     "type" : "object",
     "properties" : {
-      "name" : {
+      "movieId" : {
         "type" : "string",
-        "description" : "Name to greet. Any non-empty string."
+        "description" : "Movie ID, as it appears in the schema."
       }
     },
-    "required" : [ "name" ]
+    "required" : [ "movieId" ]
   },
   "annotations" : {
-    "title" : "",
-    "readOnlyHint" : false,
-    "destructiveHint" : true,
-    "idempotentHint" : false,
-    "openWorldHint" : true
+    "title" : "Summarize Movie Reviews",
+    "readOnlyHint" : true,
+    "destructiveHint" : false,
+    "idempotentHint" : true,
+    "openWorldHint" : false
   }
 } ]

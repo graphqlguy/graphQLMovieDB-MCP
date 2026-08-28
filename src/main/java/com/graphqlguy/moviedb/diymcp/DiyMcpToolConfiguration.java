@@ -7,11 +7,13 @@ import com.graphqlguy.moviedb.mcp.MovieOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.ExecutionGraphQlService;
+import org.springframework.graphql.ResponseError;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
 
 import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Class 13: hand-registers the three movie operations into the DIY
@@ -92,6 +94,15 @@ public class DiyMcpToolConfiguration {
             document, name, variables, Map.of(),
             UUID.randomUUID().toString(), null);
         var response = graphql.execute(request).block();
+        // A failed execution (validation error, resolver exception) returns
+        // null data plus entries in getErrors(); swallowing them would answer
+        // the agent with isError: false and a useless "null". Throw instead,
+        // so the catch in toolsCall turns the failure into isError: true.
+        if (!response.isValid() || !response.getErrors().isEmpty()) {
+            throw new IllegalStateException(response.getErrors().stream()
+                .map(ResponseError::getMessage)
+                .collect(Collectors.joining("; ")));
+        }
         return response.getData();
     }
 
