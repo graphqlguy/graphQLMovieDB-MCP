@@ -33,6 +33,12 @@ class McpEndpointIntegrationTest {
 
     McpSyncClient client;
 
+    @Autowired
+    com.graphqlguy.moviedb.watchlist.WatchlistItemRepository watchlistItemRepository;
+
+    @Autowired
+    com.graphqlguy.moviedb.user.UserRepository userRepository;
+
     @BeforeEach
     void connect() {
         client = clientAs(McpSecurityTestConfig.TEST_TOKEN);
@@ -139,4 +145,42 @@ class McpEndpointIntegrationTest {
             user.closeGracefully();
         }
     }
+
+    // Regression test for the same identity-loss bug one layer deeper.
+    // confirmAction executes the staged mutation through its own
+    // ExecutionGraphQlService call in SafeMutationTools, which needs the
+    // security context seeded exactly the way MovieMcpTools seeds it. Without
+    // that seeding the removal is refused as Unauthorized and the whole
+    // stage-and-confirm feature silently does nothing, which is worse than
+    // failing loudly: the tool reports an error the user reads as a permission
+    // problem on their own data.
+    @Test
+    void stageAndConfirmActuallyRemovesTheItem() {
+        McpSyncClient user = clientAs("user");
+        try {
+            Long userId = userRepository.findByUsername("user").orElseThrow().getId();
+            Long itemId = watchlistItemRepository.findWithContentByUserId(userId)
+                .get(0).getId();
+
+            McpSchema.CallToolResult staged = user.callTool(
+                new McpSchema.CallToolRequest("stageRemoveFromWatchlist",
+                    Map.of("itemId", itemId.toString())));
+            assertThat(staged.isError()).isNotEqualTo(true);
+
+            String token = ((McpSchema.TextContent) staged.content().get(0)).text()
+                .replaceAll(".*\"confirmationToken\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+
+            McpSchema.CallToolResult confirmed = user.callTool(
+                new McpSchema.CallToolRequest("confirmAction",
+                    Map.of("confirmationToken", token)));
+
+            String text = ((McpSchema.TextContent) confirmed.content().get(0)).text();
+            assertThat(text).contains("\"status\":\"ok\"");
+            assertThat(text).doesNotContain("Unauthorized");
+            assertThat(watchlistItemRepository.findById(itemId)).isEmpty();
+        } finally {
+            user.closeGracefully();
+        }
+    }
+
 }
