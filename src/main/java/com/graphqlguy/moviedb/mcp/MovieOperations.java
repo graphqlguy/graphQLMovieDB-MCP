@@ -11,7 +11,7 @@ public final class MovieOperations {
             title
             releaseYear
             genre
-            averageRating
+            rating
           }
         }
         """;
