@@ -36,7 +36,8 @@ public class ToolResults {
         }
 
         // HashMap, not Map.of: data can legitimately be null without errors
-        // (summarizeMovieReviews returns null below five reviews).
+        // (a nullable field, such as movie(id) for an unknown id, resolves
+        // to null on purpose).
         Map<String, Object> payload = new HashMap<>();
         payload.put("data", data);
         payload.put("errors", errors.stream().map(this::errorAsMap).toList());

@@ -34,9 +34,10 @@ type Query {
     Suitable for low-stakes recommendation flows ("I want something fun tonight")
     where the user benefits from a curated suggestion instead of an exhaustive
     search. Results are ranked by rating, highest first, with a stable tiebreak
-    on id, so repeated calls return the same order. Returns an empty list
-    (never null) when the catalog does not contain any matches for the mood;
-    an empty list is a valid answer, not a failure.
+    on id, so repeated calls return the same order; an agent that retries sees
+    the same ordering and does not need to reason about result drift. Returns
+    an empty list (never null) when the catalog does not contain any matches
+    for the mood; an empty list is a valid answer, not a failure.
     """
     recommendMoviesForMood(
         """
@@ -57,17 +58,21 @@ type Query {
     """
     Returns a structured summary of user reviews for a given movie, computed
     server-side from the underlying review corpus (integer scores from 1 to 10
-    plus free-text comments). The summary always comes back as a non-null
-    `MovieReviewSummary`; an unknown movie id produces a NOT_FOUND error
-    instead of a null result, so null cannot be confused with a bad id.
+    plus free-text comments). The summary includes a short prose synthesis of
+    what reviewers said and recurring themes pulled from the review text.
 
-    When there are fewer than three reviews, the system has insufficient
-    material to produce a meaningful prose synthesis, and `summary` is null;
-    `reviewCount` still reports the exact number of reviews so the agent can
-    distinguish "no reviews exist" from "too few reviews to summarize" by
-    inspecting the result shape instead of guessing from a null summary
-    alone. `averageScore` is null only when there are zero reviews, since
-    a mean needs at least one score to report.
+    Always returns a non-null `MovieReviewSummary` for a movie that exists;
+    unknown ids produce a NOT_FOUND error instead of a null result, so this
+    field never returns null. When there are fewer than three reviews, the
+    system has insufficient material to produce a meaningful `summary`, so
+    that field is null and the agent should read `reviewCount` to see how
+    many there were; `averageScore` is null only when `reviewCount` is zero.
+
+    When there are zero reviews, the operation still returns a
+    `MovieReviewSummary` whose `reviewCount` is zero, whose `summary` and
+    `averageScore` are null, and whose `themes` list is empty, so the agent
+    can distinguish "no reviews exist" from "fewer than three reviews exist"
+    by inspecting the result shape instead of guessing from null alone.
     """
     summarizeMovieReviews(
         """
@@ -619,9 +624,9 @@ type MovieReviewSummary {
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means no reviews exist."""
     reviewCount: Int!
-    """A short prose synthesis of what reviewers said. Null when there are fewer than three reviews; read reviewCount to see how many there were."""
+    """A short prose synthesis of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
     summary: String
-    """Recurring themes pulled from the review text. Empty when reviewCount is zero or when none were identified."""
+    """Recurring themes pulled from the review text. Empty when reviewCount is zero."""
     themes: [String!]!
     """Mean of the 1-to-10 review scores. Null only when reviewCount is zero."""
     averageScore: Float
