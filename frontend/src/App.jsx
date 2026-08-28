@@ -52,7 +52,7 @@ export default function App() {
 
         {status === 'no-graphql' && (
           <StatusPanel emoji="🚀" title="No GraphQL endpoint yet" onRetry={reload}>
-            <p>The backend is running, but it has no <code className="bg-zinc-800 text-zinc-300 rounded px-2 py-0.5">/graphql</code> endpoint yet.</p>
+            <p>The backend is running, but it does not have a <code className="bg-zinc-800 text-zinc-300 rounded px-2 py-0.5">/graphql</code> endpoint yet.</p>
             <p>
               This is where the workshop starts: add the Spring for GraphQL dependency and your
               first schema file, restart the backend, and this app will come alive.
