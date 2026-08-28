@@ -31,9 +31,9 @@ class MovieMcpToolsUnitTest {
         // objects; note genre arriving as the serialized enum name "ROMANCE".
         when(field.getValue()).thenReturn(List.of(
             Map.of("id", "1", "title", "Amelie", "releaseYear", 2001,
-                   "genre", "ROMANCE", "averageRating", 8.3),
+                   "genre", "ROMANCE", "rating", 8.3),
             Map.of("id", "2", "title", "Paddington 2", "releaseYear", 2017,
-                   "genre", "COMEDY", "averageRating", 8.0)
+                   "genre", "COMEDY", "rating", 8.0)
         ));
         when(response.field("recommendMoviesForMood")).thenReturn(field);
         when(graphql.execute(any(ExecutionGraphQlRequest.class))).thenReturn(Mono.just(response));
