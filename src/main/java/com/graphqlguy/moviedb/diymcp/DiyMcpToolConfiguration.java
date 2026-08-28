@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.ExecutionGraphQlService;
 import org.springframework.graphql.ResponseError;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.annotation.PostConstruct;
 import java.util.Map;
@@ -89,10 +91,28 @@ public class DiyMcpToolConfiguration {
                 jsonToVariables(args))));
     }
 
+    // Bug fix: graphql.execute(...) starts graphql-java's own
+    // CompletableFuture-based engine directly; it never subscribes through a
+    // Reactor pipeline tied to this call's thread, so the JWT filter's
+    // thread-local SecurityContext never reaches field resolution on its own.
+    // Spring for GraphQL restores security state per field from the
+    // ExecutionInput's GraphQLContext, keyed by SecurityContext.class.getName()
+    // (the same key SecurityContextThreadLocalAccessor reads). Seeding that key
+    // here is what carries this thread's Authentication down to
+    // WatchlistController's Principal argument and its
+    // @PreAuthorize("isAuthenticated()"); an unauthenticated caller does
+    // not have an Authentication to seed, so it is still refused there.
     private Object executeOperation(String name, String document, Map<String, Object> variables) {
         var request = new DefaultExecutionGraphQlRequest(
             document, name, variables, Map.of(),
             UUID.randomUUID().toString(), null);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (securityContext.getAuthentication() != null) {
+            request.configureExecutionInput((executionInput, builder) -> {
+                executionInput.getGraphQLContext().put(SecurityContext.class.getName(), securityContext);
+                return executionInput;
+            });
+        }
         var response = graphql.execute(request).block();
         // A failed execution (validation error, resolver exception) returns
         // null data plus entries in getErrors(); swallowing them would answer
