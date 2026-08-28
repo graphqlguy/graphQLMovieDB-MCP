@@ -54,6 +54,8 @@ public class MovieService {
                 filter != null ? filter.maxRating() : null,
                 filter != null ? filter.minYear() : null,
                 filter != null ? filter.maxYear() : null,
+                filter != null ? filter.minRuntime() : null,
+                filter != null ? filter.maxRuntime() : null,
                 filter != null ? filter.titleContains() : null,
                 pageable
         );
