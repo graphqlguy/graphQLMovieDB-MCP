@@ -34,7 +34,7 @@ public class ReviewService {
     public Review createReview(CreateReviewInput input, String username) {
         latencySimulator.pause();
         AppUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user has no matching record: " + username));
+                .orElseThrow(() -> new IllegalStateException("Authenticated user does not have a matching record: " + username));
 
         Review.ReviewBuilder review = Review.builder()
                 .user(user)
@@ -77,7 +77,7 @@ public class ReviewService {
             return Long.parseLong(rawId);
         } catch (NumberFormatException e) {
             // The GraphQL ID scalar accepts any string, so garbage like "abc" reaches
-            // us here; classify it as bad input rather than an unexpected 500.
+            // us here; classify it as bad input instead of an unexpected 500.
             throw new InvalidInputException(field, "must be a numeric ID");
         }
     }
@@ -89,7 +89,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("Review", reviewId));
         AppUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user has no matching record: " + username));
+                .orElseThrow(() -> new IllegalStateException("Authenticated user does not have a matching record: " + username));
 
         boolean isOwner = review.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole().name().equals("ADMIN");
