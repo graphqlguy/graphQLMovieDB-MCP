@@ -32,12 +32,12 @@ type Query {
     Recommends up to ten movies that fit a given mood for the current user,
     if authenticated; the operation also works for anonymous callers.
     Suitable for low-stakes recommendation flows ("I want something fun tonight")
-    where the user benefits from a curated suggestion rather than an exhaustive
-    search. Results are deterministic within a sixty-second sliding window,
-    so an agent that retries within that window sees the same ordering and does
-    not need to reason about result drift. Returns an empty list (never null)
-    when the catalog does not contain any matches for the mood; an empty list
-    is a valid answer, not a failure.
+    where the user benefits from a curated suggestion instead of an exhaustive
+    search. Results are ranked by rating, highest first, with a stable tiebreak
+    on id, so repeated calls return the same order; an agent that retries sees
+    the same ordering and does not need to reason about result drift. Returns
+    an empty list (never null) when the catalog does not contain any matches
+    for the mood; an empty list is a valid answer, not a failure.
     """
     recommendMoviesForMood(
         """
@@ -229,6 +229,10 @@ input MovieFilter {
     maxRating: Float
     minYear: Int
     maxYear: Int
+    """Only include movies at least this many minutes long. Movies with an unknown runtime are excluded when this is set."""
+    minRuntime: Int
+    """Only include movies at most this many minutes long. Movies with an unknown runtime are excluded when this is set."""
+    maxRuntime: Int
     titleContains: String
 }
 
