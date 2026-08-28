@@ -19,6 +19,8 @@ import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
 import org.springframework.graphql.ExecutionGraphQlService;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -297,11 +299,30 @@ public class MovieMcpTools {
 
     // Class 9: no error policy of its own; the caller routes the response
     // through ToolResults.toCallResult.
+    //
+    // Bug fix: graphql.execute(...) starts graphql-java's own
+    // CompletableFuture-based engine directly; it never subscribes through a
+    // Reactor pipeline tied to this call's thread, so the JWT filter's
+    // thread-local SecurityContext never reaches field resolution on its own.
+    // Spring for GraphQL restores security state per field from the
+    // ExecutionInput's GraphQLContext, keyed by SecurityContext.class.getName()
+    // (the same key SecurityContextThreadLocalAccessor reads). Seeding that key
+    // here is what carries this thread's Authentication down to
+    // WatchlistController's Principal argument and its
+    // @PreAuthorize("isAuthenticated()"); an unauthenticated caller has no
+    // Authentication to seed, so it is still refused there.
     private ExecutionGraphQlResponse executeOperationLenient(
             String operationName, String document, Map<String, Object> variables) {
         ExecutionGraphQlRequest request = new DefaultExecutionGraphQlRequest(
                 document, operationName, variables, Map.of(),
                 UUID.randomUUID().toString(), null);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (securityContext.getAuthentication() != null) {
+            request.configureExecutionInput((executionInput, builder) -> {
+                executionInput.getGraphQLContext().put(SecurityContext.class.getName(), securityContext);
+                return executionInput;
+            });
+        }
         return graphql.execute(request).block();
     }
 }
