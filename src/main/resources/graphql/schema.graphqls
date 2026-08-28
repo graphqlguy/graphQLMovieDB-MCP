@@ -3,6 +3,7 @@
 scalar DateTime
 scalar CountryCode
 
+directive @oneOf on INPUT_OBJECT
 directive @Range(min: Int = 0, max: Int = 2147483647, message: String = "graphql.validation.Range.message") on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 directive @Size(min: Int = 0, max: Int = 2147483647, message: String = "graphql.validation.Size.message") on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 directive @Pattern(regexp: String!, message: String = "graphql.validation.Pattern.message") on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
