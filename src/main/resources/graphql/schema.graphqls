@@ -59,8 +59,8 @@ type Query {
     Returns a summary of user reviews for a given movie, computed server-side
     from the underlying review corpus (integer scores from 1 to 10 plus
     free-text comments). Always returns a non-null `MovieReviewSummary` for a
-    movie that exists, so null is never a valid result: an id that does not
-    reference an existing movie produces a NOT_FOUND error instead.
+    movie that exists; null never appears as a result, because an id that does
+    not reference an existing movie produces a NOT_FOUND error instead.
 
     When the movie has fewer than three reviews, the corpus is too small to
     synthesize prose from, so `summary` is null; `reviewCount` still reports
@@ -72,8 +72,8 @@ type Query {
     summarizeMovieReviews(
         """
         The id of the movie whose reviews should be summarized. Must reference
-        an existing movie; unknown ids produce a NOT_FOUND error rather than
-        a null result, so null is never returned by this field.
+        an existing movie; unknown ids produce a NOT_FOUND error instead of
+        a null result, so this field never returns null.
         """
         movieId: ID!
     ): MovieReviewSummary!
