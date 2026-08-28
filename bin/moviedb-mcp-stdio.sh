@@ -7,7 +7,7 @@ set -euo pipefail
 # rather than a hanging connection. logback-stdio.xml routes all logs to stderr
 # and the stdio profile disables the web container and banner.
 JAR_PATH="${HOME}/projects/moviedb/target/moviedb-0.0.1-SNAPSHOT.jar"
-JAVA_HOME="${JAVA_HOME:-/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home}"
+JAVA_HOME="${JAVA_HOME:-/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home}"
 
 exec "${JAVA_HOME}/bin/java" \
     -Dlogging.config=classpath:logback-stdio.xml \
