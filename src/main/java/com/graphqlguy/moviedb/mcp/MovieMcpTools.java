@@ -225,7 +225,7 @@ public class MovieMcpTools {
             });
         }
         ExecutionGraphQlResponse response = graphql.execute(request).block();
-        if (response != null && response.getErrors() != null && !response.getErrors().isEmpty()) {
+        if (response != null && !response.getErrors().isEmpty()) {
             throw new IllegalStateException(
                 "GraphQL execution returned errors: " + response.getErrors());
         }
