@@ -30,7 +30,7 @@ public final class MovieOperations {
 
     // Class 11: raw material for the summarizer. The summary itself is computed
     // in the tool layer (sampling or the server-side fallback), so the tool
-    // reads the reviews rather than the pre-baked summarizeMovieReviews field.
+    // reads the reviews instead of the pre-baked summarizeMovieReviews field.
     public static final String MOVIE_REVIEWS = """
         query MovieReviews($movieId: ID!) {
           movie(id: $movieId) {
