@@ -63,7 +63,7 @@ public class MovieMcpTools {
             String title,
             Integer releaseYear,
             String genre,
-            Double averageRating
+            Double rating
     ) {}
 
     public record MovieReviewSummary(
