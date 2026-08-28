@@ -24,7 +24,7 @@ const INTROSPECTION = `
 
 // Result statuses:
 //   'ready'        - schema loaded, caps helpers usable
-//   'no-graphql'   - backend responds but has no /graphql endpoint yet (pre class 1)
+//   'no-graphql'   - backend responds but does not have a /graphql endpoint yet (pre class 1)
 //   'backend-down' - nothing answered on the backend port
 export async function fetchCapabilities() {
   let res;
