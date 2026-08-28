@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Controller;
 
@@ -58,15 +57,6 @@ public class MovieController {
         return result.build();
     }
 
-
-    // Class 3: `rating` was renamed to `averageRating` in the schema (the old field
-    // stays behind @deprecated during the migration window). The entity property is
-    // still `rating`, so the new field needs an explicit alias until the entity
-    // itself is renamed and the old field removed.
-    @SchemaMapping(typeName = "Movie", field = "averageRating")
-    Double averageRating(Movie movie) {
-        return movie.getRating();
-    }
 
     @MutationMapping
     Movie createMovie(@Argument CreateMovieInput input) {

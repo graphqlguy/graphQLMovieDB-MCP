@@ -132,20 +132,13 @@ type Movie implements Content {
     genre: Genre
 
     """
-    The catalog's stored average rating, from 0.0 to 10.0 inclusive. Kept for
-    compatibility with clients reading `rating` through the `Content`
-    interface; new selections should read `averageRating` instead.
-    """
-    rating: Float @deprecated(reason: "Use averageRating instead.")
-
-    """
     The catalog's stored average rating for this movie, from 0.0 to 10.0
     inclusive, captured when the title entered the catalog. Null when the
     catalog has no rating on record, which is "no data," not "rated zero"
     and not "a bad movie." For a live community score fetched from TMDB at
     request time, read `communityRating` instead.
     """
-    averageRating: Float
+    rating: Float
 
     """Runtime in minutes. Null when the catalog does not know it."""
     runtime: Int
@@ -164,7 +157,7 @@ type Movie implements Content {
 
     """
     Live community rating fetched from TMDB at request time; the freshest
-    audience signal available, distinct from `averageRating`, the catalog's
+    audience signal available, distinct from `rating`, the catalog's
     stored figure. Null when the movie has no `tmdbId` or TMDB is
     unavailable; null never means "poorly rated."
     """
