@@ -253,7 +253,7 @@ export default function HomePage() {
       {!search && !docs.GET_MOVIES && (
         <FeaturePending
           title="No movies query yet"
-          hint="The schema has no way to list movies so far. Add a query that returns movies (and the Movie type) to light this page up."
+          hint="The schema does not have a way to list movies yet. Add a query that returns movies (and the Movie type) to light this page up."
         />
       )}
 

@@ -27,7 +27,7 @@ public class UserController {
 
     // Field-level authorization: an email is visible only to an admin or to the
     // user themselves. Everyone else (another signed-in user, or an anonymous
-    // caller) sees null. Because this is a field resolver rather than @PreAuthorize,
+    // caller) sees null. Because this is a field resolver instead of @PreAuthorize,
     // a hidden email is a quiet null, not an error, so a page of reviews still
     // renders fully for everyone.
     @SchemaMapping(typeName = "User")

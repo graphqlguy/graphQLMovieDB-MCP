@@ -59,7 +59,7 @@ type Movie implements Content {
     posterUrl: String
     "The Movie Database (TMDB) external identifier"
     tmdbId: Int
-    """Live community rating from TMDB; null when the movie has no tmdbId or TMDB is unavailable"""
+    """Live community rating from TMDB; null when the movie does not have a tmdbId or TMDB is unavailable"""
     communityRating: CommunityRating
     directors: [Person!]!
     cast: [MovieCast!]!
