@@ -8,5 +8,7 @@ public record MovieFilter(
         Double maxRating,
         Integer minYear,
         Integer maxYear,
+        Integer minRuntime,
+        Integer maxRuntime,
         String titleContains
 ) {}
