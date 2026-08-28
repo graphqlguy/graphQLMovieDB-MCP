@@ -8,16 +8,13 @@ import com.graphqlguy.moviedb.recommendation.Mood;
 import com.graphqlguy.moviedb.review.Review;
 import com.graphqlguy.moviedb.watchlist.WatchStatus;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
-import io.modelcontextprotocol.spec.McpSchema.CreateMessageResult;
 import io.modelcontextprotocol.spec.McpSchema.ElicitResult;
-import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import org.springframework.ai.mcp.annotation.McpProgressToken;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
 import org.springframework.ai.mcp.annotation.context.StructuredElicitResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
 import org.springframework.graphql.ExecutionGraphQlService;
@@ -45,19 +42,23 @@ public class MovieMcpTools {
     private final ExecutionGraphQlService graphql;
     private final ObjectMapper objectMapper;
     private final ToolResults toolResults;
-    private final ServerSideSummarizer serverSideSummarizer = new ServerSideSummarizer();
+    private final SamplingReviewSummarizer samplingReviewSummarizer;
 
     @Autowired
-    public MovieMcpTools(ExecutionGraphQlService graphql, ObjectMapper objectMapper, ToolResults toolResults) {
+    public MovieMcpTools(
+            ExecutionGraphQlService graphql, ObjectMapper objectMapper, ToolResults toolResults,
+            SamplingReviewSummarizer samplingReviewSummarizer) {
         this.graphql = graphql;
         this.objectMapper = objectMapper;
         this.toolResults = toolResults;
+        this.samplingReviewSummarizer = samplingReviewSummarizer;
     }
 
-    // Convenience constructors used by unit tests: a real ObjectMapper and a
-    // ToolResults built on it are cheap and exercise the production paths.
+    // Convenience constructors used by unit tests: a real ObjectMapper, a
+    // ToolResults built on it, and a SamplingReviewSummarizer are all cheap
+    // and exercise the production paths.
     public MovieMcpTools(ExecutionGraphQlService graphql, ObjectMapper objectMapper) {
-        this(graphql, objectMapper, new ToolResults(objectMapper));
+        this(graphql, objectMapper, new ToolResults(objectMapper), new SamplingReviewSummarizer());
     }
 
     public MovieMcpTools(ExecutionGraphQlService graphql) {
@@ -157,17 +158,6 @@ public class MovieMcpTools {
             openWorldHint = false
         )
     )
-    // Class 11: the sampling call inside summarizeWithSamplingOrFallback asks
-    // the client's model to synthesize the reviews, which is slow and costs
-    // money, so a repeat call for the same movie within the cache window
-    // returns the cached MovieReviewSummary instead of sampling again. The
-    // annotation sits here, on the tool entry point, and not on the private
-    // summarizeWithSamplingOrFallback that actually performs the sampling:
-    // that method is only ever invoked through `this` from inside this same
-    // bean, and a self-invocation like that bypasses the Spring AOP proxy
-    // that @Cacheable relies on, so the annotation would silently do nothing
-    // there.
-    @Cacheable(value = "reviewSummaries", key = "#movieId")
     public MovieReviewSummary summarizeMovieReviews(
             // Class 10: both special parameters are filled in by the framework
             // and never appear in the tool's input schema. context.progress(...)
@@ -191,7 +181,7 @@ public class MovieMcpTools {
 
         context.progress(p -> p.progress(0.4).total(1.0).message("Summarizing"));
 
-        MovieReviewSummary summary = summarizeWithSamplingOrFallback(context, movieId, reviews, averageScore);
+        MovieReviewSummary summary = samplingReviewSummarizer.summarize(context, movieId, reviews, averageScore);
 
         context.progress(p -> p.progress(1.0).total(1.0).message("Done"));
 
@@ -210,64 +200,6 @@ public class MovieMcpTools {
             return List.of();
         }
         return objectMapper.convertValue(value, new TypeReference<List<Review>>() {});
-    }
-
-    // Class 11: borrow the client's model through sampling when the capability
-    // was negotiated; otherwise fall back to the server-side summarizer so the
-    // tool works against clients that never heard of sampling.
-    private MovieReviewSummary summarizeWithSamplingOrFallback(
-            McpSyncRequestContext context, String movieId, List<Review> reviews, double averageScore) {
-
-        String prompt = buildSummarizationPrompt(reviews);
-
-        if (context.sampleEnabled()) {
-            CreateMessageResult result = context.sample(s -> s
-                .message(prompt)
-                .systemPrompt("You summarize movie reviews into a short prose synthesis and recurring themes.")
-                .maxTokens(1024));
-            String text = result.content() instanceof TextContent tc ? tc.text() : "";
-            return parseSummary(movieId, reviews.size(), averageScore, text);
-        }
-        return serverSideSummarizer.summarize(movieId, reviews, averageScore);
-    }
-
-    // Lays out each review's 1-to-10 score plus its comment, so the model can
-    // ground its synthesis against the same scale the schema documents for
-    // Review.score, and pins a reply format parseSummary can read back.
-    private String buildSummarizationPrompt(List<Review> reviews) {
-        StringBuilder prompt = new StringBuilder("""
-            Summarize the following movie reviews. Scores are integers from 1 (worst)
-            to 10 (best). Reply with exactly two lines:
-            SUMMARY: one or two sentences synthesizing what reviewers said
-            THEMES: theme one; theme two; theme three
-
-            Reviews:
-            """);
-        for (Review review : reviews) {
-            prompt.append("- score ").append(review.getScore());
-            if (review.getComment() != null && !review.getComment().isBlank()) {
-                prompt.append(": ").append(review.getComment());
-            }
-            prompt.append('\n');
-        }
-        return prompt.toString();
-    }
-
-    private MovieReviewSummary parseSummary(String movieId, int reviewCount, double averageScore, String text) {
-        String summary = null;
-        List<String> themes = List.of();
-        for (String line : text.split("\\R")) {
-            String trimmed = line.trim();
-            if (trimmed.regionMatches(true, 0, "SUMMARY:", 0, 8)) {
-                summary = trimmed.substring(8).trim();
-            } else if (trimmed.regionMatches(true, 0, "THEMES:", 0, 7)) {
-                themes = java.util.Arrays.stream(trimmed.substring(7).split(";"))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .toList();
-            }
-        }
-        return new MovieReviewSummary(movieId, reviewCount, summary, themes, averageScore);
     }
 
     @McpTool(
