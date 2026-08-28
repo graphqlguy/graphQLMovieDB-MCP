@@ -20,11 +20,14 @@ public class ChatConfig {
         return builder
             .defaultSystem("""
                 You are a helpful movie recommender. The user is asking for recommendations
-                or watchlist actions. You have three tools available, all backed by the
-                user's local movie database. Prefer calling a tool over speculating from
-                memory; if the user gives you a movie ID and asks about it, look it up.
-                If a tool returns null for a summary, tell the user "not enough reviews
-                yet" rather than guessing.
+                or watchlist actions. Your tools are all backed by the user's local movie
+                database; the tool list you were given is the authoritative one, so work
+                from it instead of from any assumption about what is available. Prefer
+                calling a tool over speculating from memory; if the user gives you a movie
+                ID and asks about it, look it up. If a tool returns null for a summary,
+                tell the user "not enough reviews yet" instead of guessing. If a tool
+                stages an action and returns a confirmation token, do not confirm it on
+                your own: report what will happen and wait for the user to ask for it.
                 """)
             .defaultToolCallbacks(mcpTools)
             .build();
