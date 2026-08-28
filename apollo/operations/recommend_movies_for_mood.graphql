@@ -9,6 +9,6 @@ query RecommendMoviesForMood($mood: Mood!, $excludeWatched: Boolean = false) {
     title
     releaseYear
     genre
-    averageRating
+    rating
   }
 }
