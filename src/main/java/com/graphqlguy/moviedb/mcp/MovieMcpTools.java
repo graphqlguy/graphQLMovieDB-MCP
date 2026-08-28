@@ -17,6 +17,7 @@ import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
 import org.springframework.ai.mcp.annotation.context.StructuredElicitResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
 import org.springframework.graphql.ExecutionGraphQlService;
@@ -156,6 +157,17 @@ public class MovieMcpTools {
             openWorldHint = false
         )
     )
+    // Class 11: the sampling call inside summarizeWithSamplingOrFallback asks
+    // the client's model to synthesize the reviews, which is slow and costs
+    // money, so a repeat call for the same movie within the cache window
+    // returns the cached MovieReviewSummary instead of sampling again. The
+    // annotation sits here, on the tool entry point, and not on the private
+    // summarizeWithSamplingOrFallback that actually performs the sampling:
+    // that method is only ever invoked through `this` from inside this same
+    // bean, and a self-invocation like that bypasses the Spring AOP proxy
+    // that @Cacheable relies on, so the annotation would silently do nothing
+    // there.
+    @Cacheable(value = "reviewSummaries", key = "#movieId")
     public MovieReviewSummary summarizeMovieReviews(
             // Class 10: both special parameters are filled in by the framework
             // and never appear in the tool's input schema. context.progress(...)
