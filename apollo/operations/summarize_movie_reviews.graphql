@@ -7,8 +7,8 @@ query SummarizeMovieReviews($movieId: ID!) {
   summarizeMovieReviews(movieId: $movieId) {
     movieId
     reviewCount
-    overallSentiment
+    summary
     themes
-    generatedAt
+    averageScore
   }
 }
