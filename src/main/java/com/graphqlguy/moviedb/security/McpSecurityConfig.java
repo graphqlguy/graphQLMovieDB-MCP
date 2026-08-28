@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -38,6 +39,15 @@ public class McpSecurityConfig {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         };
         http
+            // /mcp is a stateless bearer-token API, so both of these matter.
+            // CsrfFilter would otherwise reject every POST without a token,
+            // and an MCP streamable-HTTP client's very first request is a POST
+            // `initialize`: the client would get a 403 with no
+            // WWW-Authenticate header and no way to discover what it needs.
+            // The default chain disables both for the same reason.
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .securityMatcher("/mcp", "/mcp/**",
                 "/.well-known/oauth-protected-resource",
                 "/.well-known/oauth-protected-resource/mcp")
