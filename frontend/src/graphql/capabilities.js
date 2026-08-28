@@ -24,7 +24,7 @@ const INTROSPECTION = `
 
 // Result statuses:
 //   'ready'        - schema loaded, caps helpers usable
-//   'no-graphql'   - backend responds but has no /graphql endpoint yet (pre class 1)
+//   'no-graphql'   - backend responds but does not have a /graphql endpoint yet (pre class 1)
 //   'backend-down' - nothing answered on the backend port
 export async function fetchCapabilities() {
   let res;
@@ -40,7 +40,7 @@ export async function fetchCapabilities() {
 
   if (!res.ok) {
     // 404/405: backend is up but nothing is mapped on /graphql yet.
-    // Anything else (e.g. the dev proxy's 500 when the port is closed) means no backend.
+    // Anything else (e.g. the dev proxy's 500 when the port is closed) means the backend is down.
     return { status: res.status === 404 || res.status === 405 ? 'no-graphql' : 'backend-down' };
   }
 
