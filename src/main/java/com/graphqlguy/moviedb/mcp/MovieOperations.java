@@ -21,9 +21,9 @@ public final class MovieOperations {
           summarizeMovieReviews(movieId: $movieId) {
             movieId
             reviewCount
-            overallSentiment
+            summary
             themes
-            generatedAt
+            averageScore
           }
         }
         """;
