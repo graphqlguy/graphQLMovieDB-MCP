@@ -34,6 +34,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "(:maxRating IS NULL OR m.rating <= :maxRating) AND " +
             "(:minYear IS NULL OR m.releaseYear >= :minYear) AND " +
             "(:maxYear IS NULL OR m.releaseYear <= :maxYear) AND " +
+            "(:minRuntime IS NULL OR m.runtime >= :minRuntime) AND " +
+            "(:maxRuntime IS NULL OR m.runtime <= :maxRuntime) AND " +
             "(:titleContains IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :titleContains, '%')))")
     Page<Movie> findWithFilters(
             @Param("genre") Genre genre,
@@ -41,6 +43,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             @Param("maxRating") Double maxRating,
             @Param("minYear") Integer minYear,
             @Param("maxYear") Integer maxYear,
+            @Param("minRuntime") Integer minRuntime,
+            @Param("maxRuntime") Integer maxRuntime,
             @Param("titleContains") String titleContains,
             Pageable pageable
     );
