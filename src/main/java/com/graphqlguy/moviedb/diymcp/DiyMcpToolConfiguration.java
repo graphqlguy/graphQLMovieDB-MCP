@@ -100,8 +100,8 @@ public class DiyMcpToolConfiguration {
     // (the same key SecurityContextThreadLocalAccessor reads). Seeding that key
     // here is what carries this thread's Authentication down to
     // WatchlistController's Principal argument and its
-    // @PreAuthorize("isAuthenticated()"); an unauthenticated caller has no
-    // Authentication to seed, so it is still refused there.
+    // @PreAuthorize("isAuthenticated()"); an unauthenticated caller does
+    // not have an Authentication to seed, so it is still refused there.
     private Object executeOperation(String name, String document, Map<String, Object> variables) {
         var request = new DefaultExecutionGraphQlRequest(
             document, name, variables, Map.of(),
