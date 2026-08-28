@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 // resolver are correct. GraphQLConfig is imported because the schema declares custom
 // scalars (CountryCode, DateTime) that must be wired for it to load at all. The
 // exclude filter keeps app-wide GraphQL Instrumentation beans out of this minimal
-// slice; the pattern simply matches nothing on branches that have no such beans.
+// slice; the pattern does not match anything on branches that do not have such beans.
 @GraphQlTest(value = MovieController.class,
         excludeFilters = @ComponentScan.Filter(
                 type = FilterType.REGEX,

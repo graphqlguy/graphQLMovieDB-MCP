@@ -189,7 +189,7 @@ export default function AdminPage() {
           {tmdbSearched && !tmdbLoading && !tmdbNotConfigured && tmdbResults.length === 0 && (
             <p className="mt-4 text-zinc-500 text-sm">
               No results found. If you expected results, note that TMDB search requires the backend
-              to be started with a <code className="text-zinc-400">TMDB_API_KEY</code>; without one it returns no matches.
+              to be started with a <code className="text-zinc-400">TMDB_API_KEY</code>; without one it does not return any matches.
             </p>
           )}
         </div>
