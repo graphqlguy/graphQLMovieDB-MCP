@@ -106,7 +106,7 @@ public class WatchlistService {
 
     private AppUser requireUser(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user has no matching record: " + username));
+                .orElseThrow(() -> new IllegalStateException("Authenticated user does not have a matching record: " + username));
     }
 
     private static Long parseId(String rawId, String field) {
@@ -114,7 +114,7 @@ public class WatchlistService {
             return Long.parseLong(rawId);
         } catch (NumberFormatException e) {
             // The GraphQL ID scalar accepts any string, so garbage like "abc" reaches
-            // us here; classify it as bad input rather than an unexpected 500.
+            // us here; classify it as bad input instead of an unexpected 500.
             throw new InvalidInputException(field, "must be a numeric ID");
         }
     }
