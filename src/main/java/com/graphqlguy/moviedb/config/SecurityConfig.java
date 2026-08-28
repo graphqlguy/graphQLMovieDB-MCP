@@ -21,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 //CSRF is disabled because our API is stateless. CSRF protection guards against attacks where a malicious website submits forms to
-                // your server using the victim's session cookie. Since we use JWT tokens (not cookies) and have no sessions, CSRF attacks aren't possible against our API.
+                // your server using the victim's session cookie. Since we use JWT tokens (not cookies) and do not have sessions, CSRF attacks aren't possible against our API.
                 .csrf(csrf -> csrf.disable())
                 //Session management is STATELESS because JWT tokens carry all authentication information. The server doesn't need to remember sessions between requests,
                 // which is simpler and scales better. Any server in a cluster can validate a JWT without consulting a shared session store.
