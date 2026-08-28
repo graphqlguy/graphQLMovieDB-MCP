@@ -12,20 +12,23 @@ import java.time.Instant;
  * external issuer's JWK Set, which no test can reach. This test-only
  * {@link JwtDecoder} bean replaces the network-backed decoder (Boot's own bean
  * is {@code @ConditionalOnMissingBean}, so it backs off) and decodes any token
- * string into a principal carrying every scope the tools require. The boot MCP
- * tests attach {@link #TEST_TOKEN} as a bearer token; the decoder accepts it.
+ * string into a principal carrying every scope the tools require. The subject
+ * claim is the token text itself, so a test can authenticate as any seeded
+ * {@code AppUser} (for example "user" or "mara") just by sending that
+ * username as the bearer token; {@link #TEST_TOKEN} keeps working for tests
+ * that only need an authenticated caller and never touch a user-owned record.
  */
 @TestConfiguration
 public class McpSecurityTestConfig {
 
-    static final String TEST_TOKEN = "test-token";
+    static final String TEST_TOKEN = "test-user";
     static final String ALL_SCOPES = "movies:read watchlist:read watchlist:write reviews:read";
 
     @Bean
     JwtDecoder jwtDecoder() {
         return token -> Jwt.withTokenValue(token)
             .header("alg", "none")
-            .subject("test-user")
+            .subject(token)
             .claim("scope", ALL_SCOPES)
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plusSeconds(300))
