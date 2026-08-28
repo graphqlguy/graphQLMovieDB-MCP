@@ -6,7 +6,6 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import com.graphqlguy.moviedb.recommendation.Mood;
 import com.graphqlguy.moviedb.review.Review;
-import com.graphqlguy.moviedb.review.summary.Sentiment;
 import com.graphqlguy.moviedb.watchlist.WatchStatus;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.CreateMessageResult;
@@ -25,7 +24,6 @@ import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +40,7 @@ import org.jspecify.annotations.Nullable;
 @Service
 public class MovieMcpTools {
 
-    private static final int MIN_REVIEWS_FOR_SUMMARY = 5;
+    private static final int MIN_REVIEWS_FOR_SUMMARY = 3;
 
     private final ExecutionGraphQlService graphql;
     private final ObjectMapper objectMapper;
@@ -82,9 +80,9 @@ public class MovieMcpTools {
     public record MovieReviewSummary(
             String movieId,
             Integer reviewCount,
-            Sentiment overallSentiment,
+            @Nullable String summary,
             List<String> themes,
-            OffsetDateTime generatedAt
+            @Nullable Double averageScore
     ) {}
 
     // @Nullable on both components keeps them out of the generated schema's
@@ -108,8 +106,9 @@ public class MovieMcpTools {
         description = """
             Recommend movies that fit a given mood. Suitable for low-stakes
             recommendation flows where an agent is asking on behalf of a user.
-            Results are deterministic within a 60-second window so an agent
-            that retries does not see the catalog shuffle under it.
+            Results are ranked by rating, highest first, with a stable
+            tiebreak on id, so repeated calls return the same order and an
+            agent that retries does not see the list reshuffle under it.
             """,
         annotations = @McpTool.McpAnnotations(
             title = "Recommend Movies For Mood",
@@ -146,11 +145,12 @@ public class MovieMcpTools {
     @McpTool(
         name = "summarizeMovieReviews",
         description = """
-            Summarize user reviews for a specific movie. Returns null when there
-            are not enough reviews to generate a meaningful summary (currently
-            five). Agents should treat null as "not enough data," not "no
-            reviews exist." Use this only after the user has identified a movie
-            they care about; do not call speculatively across many movies.
+            Summarize user reviews for a specific movie. Always returns a
+            summary object; when there are fewer than three reviews the
+            summary field is null and the agent should read reviewCount to
+            see how many there were. Use this only after the user has
+            identified a movie they care about; do not call speculatively
+            across many movies.
             """,
         annotations = @McpTool.McpAnnotations(
             title = "Summarize Movie Reviews",
@@ -174,13 +174,17 @@ public class MovieMcpTools {
         context.progress(p -> p.progress(0.0).total(1.0).message("Loading reviews"));
 
         List<Review> reviews = loadReviews(movieId);
+        if (reviews.isEmpty()) {
+            return new MovieReviewSummary(movieId, 0, null, List.of(), null);
+        }
+        double averageScore = reviews.stream().mapToInt(Review::getScore).average().orElseThrow();
         if (reviews.size() < MIN_REVIEWS_FOR_SUMMARY) {
-            return null;
+            return new MovieReviewSummary(movieId, reviews.size(), null, List.of(), averageScore);
         }
 
         context.progress(p -> p.progress(0.4).total(1.0).message("Summarizing"));
 
-        MovieReviewSummary summary = summarizeWithSamplingOrFallback(context, movieId, reviews);
+        MovieReviewSummary summary = summarizeWithSamplingOrFallback(context, movieId, reviews, averageScore);
 
         context.progress(p -> p.progress(1.0).total(1.0).message("Done"));
 
@@ -205,29 +209,29 @@ public class MovieMcpTools {
     // was negotiated; otherwise fall back to the server-side summarizer so the
     // tool works against clients that never heard of sampling.
     private MovieReviewSummary summarizeWithSamplingOrFallback(
-            McpSyncRequestContext context, String movieId, List<Review> reviews) {
+            McpSyncRequestContext context, String movieId, List<Review> reviews, double averageScore) {
 
         String prompt = buildSummarizationPrompt(reviews);
 
         if (context.sampleEnabled()) {
             CreateMessageResult result = context.sample(s -> s
                 .message(prompt)
-                .systemPrompt("You summarize movie reviews into themes and an overall sentiment.")
+                .systemPrompt("You summarize movie reviews into a short prose synthesis and recurring themes.")
                 .maxTokens(1024));
             String text = result.content() instanceof TextContent tc ? tc.text() : "";
-            return parseSummary(movieId, reviews.size(), text);
+            return parseSummary(movieId, reviews.size(), averageScore, text);
         }
-        return serverSideSummarizer.summarize(movieId, reviews);
+        return serverSideSummarizer.summarize(movieId, reviews, averageScore);
     }
 
-    // Lays out each review's 1-to-10 score plus its comment, so the model judges
-    // sentiment against the same scale the schema documents for Review.score,
-    // and pins a reply format parseSummary can read back.
+    // Lays out each review's 1-to-10 score plus its comment, so the model can
+    // ground its synthesis against the same scale the schema documents for
+    // Review.score, and pins a reply format parseSummary can read back.
     private String buildSummarizationPrompt(List<Review> reviews) {
         StringBuilder prompt = new StringBuilder("""
             Summarize the following movie reviews. Scores are integers from 1 (worst)
             to 10 (best). Reply with exactly two lines:
-            SENTIMENT: POSITIVE | MIXED | NEGATIVE
+            SUMMARY: one or two sentences synthesizing what reviewers said
             THEMES: theme one; theme two; theme three
 
             Reviews:
@@ -242,18 +246,13 @@ public class MovieMcpTools {
         return prompt.toString();
     }
 
-    private MovieReviewSummary parseSummary(String movieId, int reviewCount, String text) {
-        Sentiment sentiment = Sentiment.MIXED;
+    private MovieReviewSummary parseSummary(String movieId, int reviewCount, double averageScore, String text) {
+        String summary = null;
         List<String> themes = List.of();
         for (String line : text.split("\\R")) {
             String trimmed = line.trim();
-            if (trimmed.regionMatches(true, 0, "SENTIMENT:", 0, 10)) {
-                String value = trimmed.substring(10).trim().toUpperCase();
-                try {
-                    sentiment = Sentiment.valueOf(value);
-                } catch (IllegalArgumentException ignored) {
-                    // keep the MIXED default when the model strays from the format
-                }
+            if (trimmed.regionMatches(true, 0, "SUMMARY:", 0, 8)) {
+                summary = trimmed.substring(8).trim();
             } else if (trimmed.regionMatches(true, 0, "THEMES:", 0, 7)) {
                 themes = java.util.Arrays.stream(trimmed.substring(7).split(";"))
                     .map(String::trim)
@@ -261,7 +260,7 @@ public class MovieMcpTools {
                     .toList();
             }
         }
-        return new MovieReviewSummary(movieId, reviewCount, sentiment, themes, OffsetDateTime.now());
+        return new MovieReviewSummary(movieId, reviewCount, summary, themes, averageScore);
     }
 
     @McpTool(
