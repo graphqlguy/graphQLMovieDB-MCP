@@ -29,9 +29,9 @@ type Query {
     watchlist: [WatchlistItem!]!
     """
     Recommends movies that fit a given mood. Suitable for low-stakes recommendation
-    flows where an agent is asking on behalf of a user. Results are deterministic
-    within a 60-second window so an agent that retries does not see the catalog
-    shuffle under it.
+    flows where an agent is asking on behalf of a user. Results are ranked by rating,
+    highest first, with a stable tiebreak on id, so repeated calls return the same
+    order.
     """
     recommendMoviesForMood(
         mood: Mood!
@@ -153,6 +153,10 @@ input MovieFilter {
     maxRating: Float
     minYear: Int
     maxYear: Int
+    """Only include movies at least this many minutes long. Movies with an unknown runtime are excluded when this is set."""
+    minRuntime: Int
+    """Only include movies at most this many minutes long. Movies with an unknown runtime are excluded when this is set."""
+    maxRuntime: Int
     titleContains: String
 }
 
