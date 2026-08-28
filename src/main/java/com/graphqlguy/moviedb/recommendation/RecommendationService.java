@@ -39,7 +39,7 @@ public class RecommendationService {
 
     private Set<Long> watchedMovieIds(boolean excludeWatched, AppUser viewer) {
         // Anonymous viewers (viewer == null) are supported on purpose: the operation
-        // is callable without authentication, and an anonymous caller has no
+        // is callable without authentication, and an anonymous caller does not have a
         // watchlist to exclude against.
         if (!excludeWatched || viewer == null) {
             return Set.of();
