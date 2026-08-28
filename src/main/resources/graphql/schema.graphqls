@@ -43,14 +43,14 @@ type Query {
         """
         The mood to recommend for. Required. The set is bounded by design;
         if the desired mood is not in the list, the agent should pick the
-        closest available value rather than supplying a free-text hint.
+        closest available value instead of supplying a free-text hint.
         """
         mood: Mood!,
         """
         When true, omits any movie the authenticated user has marked WATCHED
         on their watch list. Defaults to false. For anonymous callers the flag
         is a no-op: there is no watch list to exclude against, and the
-        operation succeeds rather than failing.
+        operation succeeds instead of failing.
         """
         excludeWatched: Boolean = false
     ): [Movie!]!
@@ -134,7 +134,7 @@ type Movie implements Content {
     """
     The catalog's stored average rating for this movie, from 0.0 to 10.0
     inclusive, captured when the title entered the catalog. Null when the
-    catalog has no rating on record, which is "no data," not "rated zero"
+    catalog does not have a rating on record, which is "no data," not "rated zero"
     and not "a bad movie." For a live community score fetched from TMDB at
     request time, read `communityRating` instead.
     """
@@ -150,22 +150,23 @@ type Movie implements Content {
     posterUrl: String
 
     """
-    The Movie Database (TMDB) external identifier. Null when the title has
-    no TMDB link, in which case `communityRating` is also null.
+    The Movie Database (TMDB) external identifier. Null when the title does
+    not have a TMDB link, in which case `communityRating` is also null.
     """
     tmdbId: Int
 
     """
     Live community rating fetched from TMDB at request time; the freshest
     audience signal available, distinct from `rating`, the catalog's
-    stored figure. Null when the movie has no `tmdbId` or TMDB is
+    stored figure. Null when the movie does not have a `tmdbId` or TMDB is
     unavailable; null never means "poorly rated."
     """
     communityRating: CommunityRating
 
     """
     The directors on record for this movie. An empty list means the catalog
-    has no director recorded for the title, not that the film has none.
+    does not have a director recorded for the title, not that the film did
+    not have one.
     """
     directors: [Person!]!
 
@@ -177,14 +178,15 @@ type Movie implements Content {
 
     """
     User-submitted reviews for this movie, newest first. An empty list means
-    no reviews exist; reviews are public and reading them requires no
-    authentication. Each review carries an integer `score` from 1 to 10.
+    the movie does not have any reviews; reviews are public, and reading
+    them does not require authentication. Each review carries an integer
+    `score` from 1 to 10.
     """
     reviews: [Review!]!
 
     """
     Number of reviews on record for this movie. Always present; zero means
-    no reviews exist.
+    the movie does not have any reviews.
     """
     reviewCount: Int!
 }
@@ -509,7 +511,7 @@ type WatchlistItem {
 enum WatchStatus {
     """On the list, not yet seen. The default for new entries."""
     WANT_TO_WATCH
-    """The user has seen it; the entry remains on the list as a record rather than a plan."""
+    """The user has seen it; the entry remains on the list as a record instead of a plan."""
     WATCHED
 }
 
@@ -615,7 +617,7 @@ from the review corpus.
 type MovieReviewSummary {
     """The id of the summarized movie, echoing the operation's argument."""
     movieId: ID!
-    """Number of reviews the summary was computed from. Zero means no reviews exist."""
+    """Number of reviews the summary was computed from. Zero means the movie does not have any reviews."""
     reviewCount: Int!
     """A short prose synthesis of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
     summary: String
