@@ -52,11 +52,15 @@ public class DiyMcpController {
 
         return switch (method) {
             case "initialize" -> ResponseEntity.ok(initialize(request, id));
-            // Notifications do not carry an id and MUST get an empty 202 Accepted.
-            case "notifications/initialized" -> ResponseEntity.accepted().build();
             case "tools/list" -> ResponseEntity.ok(toolsList(id));
             case "tools/call" -> ResponseEntity.ok(toolsCall(request, id));
-            default -> ResponseEntity.ok(error(request, -32601, "Method not found: " + method));
+            // Every notification (notifications/initialized, notifications/cancelled,
+            // and any the client adds later) is acknowledged with 202 and an empty body.
+            // A JSON-RPC error may only answer a request; answering a notification
+            // is a protocol violation that real clients treat as a broken server.
+            default -> method.startsWith("notifications/")
+                ? ResponseEntity.accepted().build()
+                : ResponseEntity.ok(error(request, -32601, "Method not found: " + method));
         };
     }
 
@@ -93,7 +97,9 @@ public class DiyMcpController {
             try {
                 entry.set("inputSchema", mapper.readTree(tool.inputSchema()));
             } catch (Exception e) {
-                entry.put("inputSchema", "{}");
+                // The fallback must be a JSON Schema *object*; writing the
+                // string "{}" here would produce an invalid tool entry.
+                entry.putObject("inputSchema").put("type", "object");
             }
         }
         return response;
@@ -151,7 +157,11 @@ public class DiyMcpController {
     private ObjectNode error(JsonNode request, int code, String message) {
         ObjectNode response = mapper.createObjectNode();
         response.put("jsonrpc", "2.0");
+        // JSON-RPC 2.0 requires every response to carry an id. When the
+        // request was too malformed for an id to be detected, the spec says
+        // the id MUST be null instead of absent, so we always write one.
         if (request.has("id")) response.set("id", request.get("id"));
+        else response.putNull("id");
         ObjectNode err = response.putObject("error");
         err.put("code", code);
         err.put("message", message);
