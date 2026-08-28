@@ -20,6 +20,8 @@ import org.springframework.graphql.ExecutionGraphQlResponse;
 import org.springframework.graphql.ExecutionGraphQlService;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -304,11 +306,36 @@ public class MovieMcpTools {
 
     // Class 9: no error policy of its own; the caller routes the response
     // through ToolResults.toCallResult.
+    //
+    // Class 18 fix: graphql.execute(...) starts graphql-java's own
+    // CompletableFuture-based engine directly; it never subscribes through a
+    // Reactor pipeline tied to this call's thread, so a plain
+    // Mono.contextWrite(...) around it never reaches the field resolvers.
+    // Spring for GraphQL's own request-scoped propagation instead reads the
+    // ExecutionInput's GraphQLContext: on every field it takes a fresh
+    // snapshot of whichever registered thread-local values that GraphQLContext
+    // carries (keyed by each accessor's key, here
+    // SecurityContext.class.getName(), the same key
+    // SecurityContextThreadLocalAccessor uses) and restores them around the
+    // resolver call, on whatever thread actually runs it. Seeding that same
+    // key with this call's SecurityContext before execution starts is what
+    // carries this thread's Authentication down to WatchlistController's
+    // Principal argument and its @PreAuthorize("isAuthenticated()"), instead
+    // of the anonymous context they saw before. An unauthenticated caller is
+    // still refused earlier, at the tool-level @PreAuthorize checked below,
+    // so there is nothing to seed in that case.
     private ExecutionGraphQlResponse executeOperationLenient(
             String operationName, String document, Map<String, Object> variables) {
         ExecutionGraphQlRequest request = new DefaultExecutionGraphQlRequest(
                 document, operationName, variables, Map.of(),
                 UUID.randomUUID().toString(), null);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (securityContext.getAuthentication() != null) {
+            request.configureExecutionInput((executionInput, builder) -> {
+                executionInput.getGraphQLContext().put(SecurityContext.class.getName(), securityContext);
+                return executionInput;
+            });
+        }
         return graphql.execute(request).block();
     }
 }
