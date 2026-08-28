@@ -7,6 +7,7 @@ import org.springframework.graphql.ExecutionGraphQlService;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -107,6 +108,13 @@ public class SafeMutationTools {
         var request = new DefaultExecutionGraphQlRequest(
             MovieOperations.REMOVE_FROM_WATCHLIST, "RemoveFromWatchlist",
             action.args(), Map.of(), UUID.randomUUID().toString(), null);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (securityContext.getAuthentication() != null) {
+            request.configureExecutionInput((executionInput, builder) -> {
+                executionInput.getGraphQLContext().put(SecurityContext.class.getName(), securityContext);
+                return executionInput;
+            });
+        }
         ExecutionGraphQlResponse response = graphql.execute(request).block();
         if (response != null && !response.getErrors().isEmpty()) {
             return Map.of("status", "error",
