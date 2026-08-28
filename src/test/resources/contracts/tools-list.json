@@ -34,6 +34,28 @@
     "openWorldHint" : false
   }
 }, {
+  "name" : "ping",
+  "title" : "ping",
+  "description" : "Smoke-test tool. Returns a greeting that echoes the supplied name. Used during Class 6 to verify the MCP server wiring before real tools are added in Class 7.",
+  "inputSchema" : {
+    "$schema" : "https://json-schema.org/draft/2020-12/schema",
+    "type" : "object",
+    "properties" : {
+      "name" : {
+        "type" : "string",
+        "description" : "Name to greet. Any non-empty string."
+      }
+    },
+    "required" : [ "name" ]
+  },
+  "annotations" : {
+    "title" : "",
+    "readOnlyHint" : false,
+    "destructiveHint" : true,
+    "idempotentHint" : false,
+    "openWorldHint" : true
+  }
+}, {
   "name" : "recommendMoviesForMood",
   "title" : "Recommend Movies For Mood",
   "description" : "Recommends up to ten movies that fit a given mood for the current user,\nif authenticated; the operation also works for anonymous callers.\nSuitable for low-stakes recommendation flows (\"I want something fun tonight\")\nwhere the user benefits from a curated suggestion instead of an exhaustive\nsearch. Results are ranked by rating, highest first, with a stable tiebreak\non id, so repeated calls return the same order; an agent that retries sees\nthe same ordering and does not need to reason about result drift. Returns\nan empty list (never null) when the catalog does not contain any matches\nfor the mood; an empty list is a valid answer, not a failure.",
@@ -86,27 +108,5 @@
     "destructiveHint" : false,
     "idempotentHint" : true,
     "openWorldHint" : false
-  }
-}, {
-  "name" : "ping",
-  "title" : "ping",
-  "description" : "Smoke-test tool. Returns a greeting that echoes the supplied name. Used during Class 6 to verify the MCP server wiring before real tools are added in Class 7.",
-  "inputSchema" : {
-    "$schema" : "https://json-schema.org/draft/2020-12/schema",
-    "type" : "object",
-    "properties" : {
-      "name" : {
-        "type" : "string",
-        "description" : "Name to greet. Any non-empty string."
-      }
-    },
-    "required" : [ "name" ]
-  },
-  "annotations" : {
-    "title" : "",
-    "readOnlyHint" : false,
-    "destructiveHint" : true,
-    "idempotentHint" : false,
-    "openWorldHint" : true
   }
 } ]
