@@ -40,7 +40,7 @@ public class DiyMcpController {
             @RequestBody JsonNode request) {
         // Transport MUST: validate Origin to defend against DNS rebinding.
         // Browsers always attach Origin on cross-origin requests; non-browser
-        // clients (curl, server-side proxies) send none, so null passes.
+        // clients (curl, server-side proxies) do not send one, so null passes.
         if (origin != null && !ALLOWED_ORIGINS.contains(origin)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -52,7 +52,7 @@ public class DiyMcpController {
 
         return switch (method) {
             case "initialize" -> ResponseEntity.ok(initialize(request, id));
-            // Notifications carry no id and MUST get an empty 202 Accepted.
+            // Notifications do not carry an id and MUST get an empty 202 Accepted.
             case "notifications/initialized" -> ResponseEntity.accepted().build();
             case "tools/list" -> ResponseEntity.ok(toolsList(id));
             case "tools/call" -> ResponseEntity.ok(toolsCall(request, id));
