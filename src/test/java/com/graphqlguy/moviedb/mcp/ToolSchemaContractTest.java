@@ -12,6 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -35,7 +36,9 @@ class ToolSchemaContractTest {
         client.closeGracefully();
 
         String actual = mapper.writerWithDefaultPrettyPrinter()
-            .writeValueAsString(tools.tools());
+            .writeValueAsString(tools.tools().stream()
+                .sorted(Comparator.comparing(McpSchema.Tool::name))
+                .toList());
 
         String expected = new ClassPathResource("contracts/tools-list.json")
             .getContentAsString(StandardCharsets.UTF_8);
