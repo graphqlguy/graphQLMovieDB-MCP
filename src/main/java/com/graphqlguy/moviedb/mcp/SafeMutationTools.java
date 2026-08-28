@@ -108,7 +108,7 @@ public class SafeMutationTools {
             MovieOperations.REMOVE_FROM_WATCHLIST, "RemoveFromWatchlist",
             action.args(), Map.of(), UUID.randomUUID().toString(), null);
         ExecutionGraphQlResponse response = graphql.execute(request).block();
-        if (response != null && response.getErrors() != null && !response.getErrors().isEmpty()) {
+        if (response != null && !response.getErrors().isEmpty()) {
             return Map.of("status", "error",
                 "message", "Removal failed: " + response.getErrors());
         }
