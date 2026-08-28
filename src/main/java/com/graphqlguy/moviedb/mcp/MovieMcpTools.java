@@ -5,7 +5,6 @@ package com.graphqlguy.moviedb.mcp;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import com.graphqlguy.moviedb.recommendation.Mood;
-import com.graphqlguy.moviedb.review.summary.Sentiment;
 import com.graphqlguy.moviedb.watchlist.WatchStatus;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
@@ -15,7 +14,6 @@ import org.springframework.graphql.ExecutionGraphQlService;
 import org.springframework.graphql.support.DefaultExecutionGraphQlRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +54,9 @@ public class MovieMcpTools {
     public record MovieReviewSummary(
             String movieId,
             Integer reviewCount,
-            Sentiment overallSentiment,
+            @Nullable String summary,
             List<String> themes,
-            OffsetDateTime generatedAt
+            @Nullable Double averageScore
     ) {}
 
     // @Nullable on both components keeps them out of the generated schema's
@@ -82,8 +80,9 @@ public class MovieMcpTools {
         description = """
             Recommend movies that fit a given mood. Suitable for low-stakes
             recommendation flows where an agent is asking on behalf of a user.
-            Results are deterministic within a 60-second window so an agent
-            that retries does not see the catalog shuffle under it.
+            Results are ranked by rating, highest first, with a stable
+            tiebreak on id, so repeated calls return the same order and an
+            agent that retries does not see the list reshuffle under it.
             """,
         annotations = @McpTool.McpAnnotations(
             title = "Recommend Movies For Mood",
@@ -117,11 +116,13 @@ public class MovieMcpTools {
     @McpTool(
         name = "summarizeMovieReviews",
         description = """
-            Summarize user reviews for a specific movie. Returns null when there
-            are not enough reviews to generate a meaningful summary (currently
-            five). Agents should treat null as "not enough data," not "no
-            reviews exist." Use this only after the user has identified a movie
-            they care about; do not call speculatively across many movies.
+            Summarize user reviews for a specific movie. Always returns a
+            summary object for a movie that exists; an unknown movie id
+            fails with a NOT_FOUND error. When there are fewer than three
+            reviews, the summary field is null and the agent should read
+            reviewCount to see how many there were. Use this only after
+            the user has identified a movie they care about; do not call
+            speculatively across many movies.
             """,
         annotations = @McpTool.McpAnnotations(
             title = "Summarize Movie Reviews",
