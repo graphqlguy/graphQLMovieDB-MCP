@@ -235,7 +235,7 @@ public class MovieMcpTools {
     private ExecutionGraphQlResponse executeOperation(
             String operationName, String document, Map<String, Object> variables) {
         ExecutionGraphQlResponse response = executeOperationLenient(operationName, document, variables);
-        if (response != null && response.getErrors() != null && !response.getErrors().isEmpty()) {
+        if (response != null && !response.getErrors().isEmpty()) {
             throw new IllegalStateException(
                 "GraphQL execution returned errors: " + response.getErrors());
         }
