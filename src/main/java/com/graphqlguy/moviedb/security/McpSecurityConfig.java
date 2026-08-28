@@ -1,6 +1,7 @@
 package com.graphqlguy.moviedb.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -9,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.List;
 
 /**
  * Class 15: a second security filter chain, scoped by {@code securityMatcher}
@@ -20,6 +23,12 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 public class McpSecurityConfig {
+
+    @Value("${moviedb.mcp.resource}")
+    private String resource;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuer;
 
     @Bean
     @Order(1)
@@ -54,6 +63,20 @@ public class McpSecurityConfig {
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth -> oauth
                 .jwt(jwt -> {})
+                // Spring Security serves the RFC 9728 document itself, from a
+                // filter that runs ahead of the DispatcherServlet. Describing
+                // the resource here is the only way to reach that document; a
+                // @RestController mapped to the same paths would be shadowed
+                // by the filter and never called.
+                .protectedResourceMetadata(metadata -> metadata
+                    .protectedResourceMetadataCustomizer(builder -> builder
+                        .resource(resource)
+                        .authorizationServer(issuer)
+                        .scopes(scopes -> scopes.addAll(List.of(
+                            "movies:read", "watchlist:read",
+                            "watchlist:write", "reviews:read")))
+                        .claim("resource_documentation",
+                            "https://graphqlguy.com/docs/tutorial-graphql-mcp")))
                 .authenticationEntryPoint(entryPoint));
         return http.build();
     }
