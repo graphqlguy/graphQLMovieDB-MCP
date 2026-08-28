@@ -523,6 +523,46 @@ public class DataInitializer {
                 List.of(toddPhillips),
                 List.of(new CastEntry(bradleyCooper, "Phil Wenneck"), new CastEntry(edHelms, "Stu Price"), new CastEntry(zachGalifianakis, "Alan Garner"), new CastEntry(justinBartha, "Doug Billings")));
 
+            // COMEDY (2016 and later, added so the "comedy under two hours" free-text example returns results)
+            Person shaneBlack = personRepo.save(Person.builder().name("Shane Black").birthYear(1961).countryCode("US")
+                    .biography("Writer-director known for irreverent buddy-comedy dialogue.").photoUrl(BASE + "fafBg8LjtQqsXyFg8ZgW7DHQXKt.jpg").build());
+            Person russellCrowe = personRepo.save(Person.builder().name("Russell Crowe").birthYear(1964).countryCode("NZ")
+                    .biography("Oscar-winning actor known for commanding dramatic roles.").photoUrl(BASE + "uxiXuVH4vNWrKlJMVVPG1sxAJFe.jpg").build());
+            saveMovie(Movie.builder().title("The Nice Guys").releaseYear(2016).genre(Genre.COMEDY).rating(7.1).runtime(116)
+                    .plot("A private eye investigates the apparent suicide of a fading porn star in 1970s Los Angeles and uncovers a conspiracy.")
+                    .posterUrl(BASE + "clq4So9spa9cXk3MZy2iMdqkxP2.jpg").tmdbId(290250).build(),
+                List.of(shaneBlack),
+                List.of(new CastEntry(russellCrowe, "Jackson Healy"), new CastEntry(ryanGosling, "Holland March")));
+            Person armandoIannucci = personRepo.save(Person.builder().name("Armando Iannucci").birthYear(1963).countryCode("GB")
+                    .biography("Satirist known for razor-sharp political comedy.").photoUrl(BASE + "jFFx3mmVFA2ApjcVAhVVznjjrLI.jpg").build());
+            Person simonRussellBeale = personRepo.save(Person.builder().name("Simon Russell Beale").birthYear(1961).countryCode("MY")
+                    .biography("Acclaimed stage and screen actor known for classical roles.").photoUrl(BASE + "uw0ngaqgT8qXwJqVr353cx1mEdB.jpg").build());
+            saveMovie(Movie.builder().title("The Death of Stalin").releaseYear(2017).genre(Genre.COMEDY).rating(7.0).runtime(107)
+                    .plot("When dictator Joseph Stalin dies, his parasitic cronies square off in a frantic power struggle to become the next Soviet leader. As they bumble, brawl and back-stab their way to the top, the question remains: just who is running the government?")
+                    .posterUrl(BASE + "AqH7q89NxGRDAyRWKqsL3OBtYfV.jpg").tmdbId(402897).build(),
+                List.of(armandoIannucci),
+                List.of(new CastEntry(steveBuscemi, "Nikita Khrushchev"), new CastEntry(simonRussellBeale, "Lavrenti Beria")));
+            Person bryanCranston = personRepo.save(Person.builder().name("Bryan Cranston").birthYear(1956).countryCode("US")
+                    .biography("Emmy-winning actor known for Breaking Bad.").photoUrl(BASE + "npIIZJGSrcJIJ6yHdmbqO6Jzo5I.jpg").build());
+            Person edwardNorton = personRepo.save(Person.builder().name("Edward Norton").birthYear(1969).countryCode("US")
+                    .biography("Versatile actor known for intense character studies.").photoUrl(BASE + "8nytsqL59SFJTVYVrN72k6qkGgJ.jpg").build());
+            saveMovie(Movie.builder().title("Isle of Dogs").releaseYear(2018).genre(Genre.COMEDY).rating(7.8).runtime(101)
+                    .plot("In the future, an outbreak of canine flu leads the mayor of a Japanese city to banish all dogs to an island used as a garbage dump. The outcasts must soon embark on an epic journey when a 12-year-old boy arrives on the island to find his beloved pet.")
+                    .posterUrl(BASE + "c0nUX6Q1ZB0P2t1Jo6EeFSVnOGQ.jpg").tmdbId(399174).build(),
+                List.of(wesAnderson),
+                List.of(new CastEntry(bryanCranston, "Chief"), new CastEntry(edwardNorton, "Rex"), new CastEntry(billMurray, "Boss")));
+            Person oliviaWilde = personRepo.save(Person.builder().name("Olivia Wilde").birthYear(1984).countryCode("US")
+                    .biography("Actor-director known for Booksmart.").photoUrl(BASE + "eODi1QKamyVa41eSK2SjU20VAZS.jpg").build());
+            Person kaitlynDever = personRepo.save(Person.builder().name("Kaitlyn Dever").birthYear(1996).countryCode("US")
+                    .biography("Actress known for Booksmart and Unbelievable.").photoUrl(BASE + "np5rBCFRdeS1sXePL8uY09ktoC4.jpg").build());
+            Person beanieFeldstein = personRepo.save(Person.builder().name("Beanie Feldstein").birthYear(1993).countryCode("US")
+                    .biography("Actress known for Booksmart and Lady Bird.").photoUrl(BASE + "lyK1s3TcUKQidfVDnNPt3TAc6mI.jpg").build());
+            saveMovie(Movie.builder().title("Booksmart").releaseYear(2019).genre(Genre.COMEDY).rating(7.0).runtime(102)
+                    .plot("Two academic teenage superstars realize, on the eve of their high school graduation, that they should have worked less and played more. Determined to never fall short of their peers, the girls set out on a mission to cram four years of fun into one night.")
+                    .posterUrl(BASE + "2aSxRDmisJP90H3S0aocyuQIe4z.jpg").tmdbId(505600).build(),
+                List.of(oliviaWilde),
+                List.of(new CastEntry(kaitlynDever, "Amy"), new CastEntry(beanieFeldstein, "Molly")));
+
             // SCI-FI
             saveMovie(Movie.builder().title("The Terminator").releaseYear(1984).genre(Genre.SCIFI).rating(8.1).runtime(107)
                     .plot("In the post-apocalyptic future, reigning tyrannical supercomputers teleport a cyborg assassin known as the \"Terminator\" back to 1984 to kill Sarah Connor, whose unborn son is destined to lead insurgents against 21st century mechanical hegemony. Meanwhile, the human-resistance movement dispatches a lone warrior to safeguard Sarah. Can he stop the virtually indestructible killing machine?")
