@@ -57,13 +57,11 @@ public class MovieService {
                 filter != null ? filter.minRuntime() : null,
                 filter != null ? filter.maxRuntime() : null,
                 filter != null ? filter.titleContains() : null,
-                pageable
-        );
+                pageable);
         return new MoviePage(
                 result.getContent(), result.getTotalElements(), result.getTotalPages(),
                 result.getNumber(), result.getSize(), result.isFirst(), result.isLast(),
-                result.hasNext(), result.hasPrevious()
-        );
+                result.hasNext(), result.hasPrevious());
     }
 
     private Sort buildSort(MovieSort sort) {
