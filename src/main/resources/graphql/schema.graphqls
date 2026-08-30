@@ -53,7 +53,7 @@ type Query {
         is a no-op: there is no watch list to exclude against, and the
         operation succeeds instead of failing.
         """
-        excludeWatched: Boolean = false
+        excludeWatched: Boolean! = false
     ): [Movie!]!
 
     """
