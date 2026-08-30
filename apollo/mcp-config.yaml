@@ -25,3 +25,4 @@ forward_headers:
 
 overrides:
   mutation_mode: explicit
+  enable_output_schema: true
