@@ -35,7 +35,7 @@ type Query {
     """
     recommendMoviesForMood(
         mood: Mood!
-        excludeWatched: Boolean = false
+        excludeWatched: Boolean! = false
     ): [Movie!]!
 
     """
