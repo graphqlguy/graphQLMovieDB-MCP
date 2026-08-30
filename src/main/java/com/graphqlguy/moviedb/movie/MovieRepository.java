@@ -46,8 +46,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             @Param("minRuntime") Integer minRuntime,
             @Param("maxRuntime") Integer maxRuntime,
             @Param("titleContains") String titleContains,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     List<Movie> findByDirectorsContaining(Person person);
 }
