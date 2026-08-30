@@ -90,20 +90,16 @@ public class MovieMcpTools {
             readOnlyHint = true,
             destructiveHint = false,
             idempotentHint = true,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     public List<MovieSummary> recommendMoviesForMood(
             @McpToolParam(
                 description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDY) and an excludeWatched flag, which the input schema requires on every call. Send false unless the user wants movies they have already marked WATCHED on their watchlist filtered out.",
-                required = true
-            )
+                required = true)
             RecommendInput input) {
 
         Map<String, Object> variables = Map.of(
             "mood", input.mood().name(),
-            "excludeWatched", input.excludeWatched()
-        );
+            "excludeWatched", input.excludeWatched());
 
         ExecutionGraphQlResponse response = executeOperation(
             "RecommendMoviesForMood",
@@ -131,9 +127,7 @@ public class MovieMcpTools {
             readOnlyHint = true,
             destructiveHint = false,
             idempotentHint = true,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     public MovieReviewSummary summarizeMovieReviews(
             @McpToolParam(description = "Movie ID, as it appears in the schema.", required = true)
             String movieId) {
@@ -162,9 +156,7 @@ public class MovieMcpTools {
             readOnlyHint = false,
             destructiveHint = false,
             idempotentHint = true,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     public WatchlistItemSummary addToWatchlist(
             @McpToolParam(description = "The title to add: exactly one of movieId or tvShowId.", required = true)
             WatchlistSubject subject,
