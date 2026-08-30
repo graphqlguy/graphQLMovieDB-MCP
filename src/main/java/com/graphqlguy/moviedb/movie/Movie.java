@@ -42,8 +42,7 @@ public class Movie implements SearchResult, Content {
     @JoinTable(
             name = "movies_directors",
             joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "director_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "director_id"))
     private List<Person> directors =  new ArrayList<>();
 
     @Builder.Default
