@@ -50,9 +50,7 @@ public class SafeMutationTools {
             readOnlyHint = false,
             destructiveHint = true,
             idempotentHint = false,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     @PreAuthorize("hasAuthority('SCOPE_watchlist:write')")
     public Map<String, Object> stageRemoveFromWatchlist(
             @McpToolParam(required = true) String itemId) {
@@ -72,8 +70,7 @@ public class SafeMutationTools {
         description = """
             Execute a previously staged action by confirmation token. Single-use.
             Tokens expire 60 seconds after staging.
-            """
-    )
+            """)
     @PreAuthorize("hasAuthority('SCOPE_watchlist:write')")
     public Map<String, Object> confirmAction(@McpToolParam(required = true) String confirmationToken) {
         PendingAction action = pending.remove(confirmationToken);
