@@ -55,8 +55,7 @@ class SchemaDescriptionLintTest {
         "TvShowCast.id", "TvShowCast.characterName", "TvShowCast.person", "TvShowCast.tvShow",
         "TvShowPage.content", "TvShowPage.totalElements", "TvShowPage.totalPages",
         "TvShowPage.currentPage", "TvShowPage.size",
-        "User.id", "User.username", "User.email", "User.role"
-    );
+        "User.id", "User.username", "User.email", "User.role");
 
     @Autowired
     GraphQlSource graphQlSource;

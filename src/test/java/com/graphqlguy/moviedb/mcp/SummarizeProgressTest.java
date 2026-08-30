@@ -44,8 +44,7 @@ class SummarizeProgressTest {
             Map.of("score", 8, "comment", "Charming characters"),
             Map.of("score", 7, "comment", "A cozy watch"),
             Map.of("score", 9, "comment", "Gorgeous soundtrack"),
-            Map.of("score", 8, "comment", "Feel-good from start to finish")
-        );
+            Map.of("score", 8, "comment", "Feel-good from start to finish"));
         return new MovieMcpTools(MockGraphQlServiceFactory.returning(cannedReviews), new ObjectMapper());
     }
 }

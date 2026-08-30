@@ -22,8 +22,7 @@ public class RecommendationController {
     List<Movie> recommendMoviesForMood(
         @Argument Mood mood,
         @Argument boolean excludeWatched,
-        Principal principal
-    ) {
+        Principal principal) {
         AppUser viewer = resolveViewer(principal);
         return recommendationService.recommendForMood(mood, excludeWatched, viewer);
     }
