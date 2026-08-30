@@ -66,8 +66,7 @@ public class TvShow implements SearchResult, Content {
     @JoinTable(
             name = "tvshow_creators",
             joinColumns = @JoinColumn(name = "tvshow_id"),
-            inverseJoinColumns = @JoinColumn(name = "person_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "person_id"))
     @Builder.Default
     private Set<Person> creators = new HashSet<>();
 
