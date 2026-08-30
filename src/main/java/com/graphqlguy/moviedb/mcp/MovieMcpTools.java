@@ -119,23 +119,19 @@ public class MovieMcpTools {
             readOnlyHint = true,
             destructiveHint = false,
             idempotentHint = true,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     // Class 15: reads require movies:read. SCOPE_ is Spring Security's prefix
     // for OAuth scopes mapped from the JWT scope claim.
     @PreAuthorize("hasAuthority('SCOPE_movies:read')")
     public List<MovieSummary> recommendMoviesForMood(
             @McpToolParam(
                 description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDY) and an excludeWatched flag, which the input schema requires on every call. Send false unless the user wants movies they have already marked WATCHED on their watchlist filtered out.",
-                required = true
-            )
+                required = true)
             RecommendInput input) {
 
         Map<String, Object> variables = Map.of(
             "mood", input.mood().name(),
-            "excludeWatched", input.excludeWatched()
-        );
+            "excludeWatched", input.excludeWatched());
 
         ExecutionGraphQlResponse response = executeOperation(
             "RecommendMoviesForMood",
@@ -161,9 +157,7 @@ public class MovieMcpTools {
             readOnlyHint = true,
             destructiveHint = false,
             idempotentHint = true,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     @PreAuthorize("hasAuthority('SCOPE_movies:read') and hasAuthority('SCOPE_reviews:read')")
     public MovieReviewSummary summarizeMovieReviews(
             // Class 10: both special parameters are filled in by the framework
@@ -224,9 +218,7 @@ public class MovieMcpTools {
             readOnlyHint = false,
             destructiveHint = false,
             idempotentHint = true,
-            openWorldHint = false
-        )
-    )
+            openWorldHint = false))
     // Class 15: a write to user-owned data requires watchlist:write.
     @PreAuthorize("hasAuthority('SCOPE_watchlist:write')")
     public CallToolResult addToWatchlist(
