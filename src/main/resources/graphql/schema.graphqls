@@ -63,7 +63,7 @@ type Query {
     not reference an existing movie produces a NOT_FOUND error instead.
 
     When the movie has fewer than three reviews, the corpus is too small to
-    synthesize prose from, so `summary` is null; `reviewCount` still reports
+    summarize, so `summary` is null; `reviewCount` still reports
     the exact number on record, so the agent can decide whether to wait for
     more reviews or read `Movie.reviews` directly. When there are zero
     reviews, `reviewCount` is zero, `summary` and `averageScore` are both
@@ -160,8 +160,8 @@ type Movie implements Content {
 
     """
     The directors on record for this movie. An empty list means the catalog
-    does not have a director recorded for the title, not that the film did
-    not have one.
+    does not have a director on record for the title, not that the film
+    never had one.
     """
     directors: [Person!]!
 
@@ -606,7 +606,7 @@ enum Mood {
 }
 
 """
-A server-computed summary of a movie's review corpus: a prose synthesis of
+A server-computed snapshot of a movie's review corpus: a short summary of
 what reviewers said, plus the recurring themes and the mean score it was
 computed from.
 """
@@ -615,7 +615,7 @@ type MovieReviewSummary {
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means the movie does not have any reviews."""
     reviewCount: Int!
-    """A short prose synthesis of what reviewers said. Null when reviewCount is below three, the minimum the summary needs to say something meaningful; read reviewCount to see how many there were."""
+    """A short summary of what reviewers said. Null when reviewCount is below three, the minimum the summary needs to say something meaningful; read reviewCount to see how many there were."""
     summary: String
     """Recurring themes pulled from the review text. Empty when reviewCount is zero or no theme was identified."""
     themes: [String!]!
