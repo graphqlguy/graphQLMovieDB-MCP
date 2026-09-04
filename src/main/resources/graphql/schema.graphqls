@@ -41,7 +41,7 @@ type Query {
     """
     Returns a summary of user reviews for a movie. Always returns a summary object
     for a movie that exists; an unknown id produces a NOT_FOUND error. When the
-    movie has too few reviews to synthesize prose, `summary` is null and
+    movie has too few reviews to summarize, `summary` is null and
     `reviewCount` says how many there were.
     """
     summarizeMovieReviews(
@@ -73,7 +73,7 @@ type MovieReviewSummary {
     movieId: ID!
     """How many reviews this summary was computed from."""
     reviewCount: Int!
-    """A short prose synthesis of what reviewers said. Null when there are too few reviews to write one; read reviewCount to see how many there were."""
+    """A short summary of what reviewers said. Null when there are too few reviews to write one; read reviewCount to see how many there were."""
     summary: String
     """Recurring subjects across the reviews. Empty when none were identified."""
     themes: [String!]!
