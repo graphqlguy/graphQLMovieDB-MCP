@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * Class 11: the fallback summarizer used when the client did not negotiate the
- * sampling capability. The prose line comes from integer score bands on the
+ * sampling capability. The summary line comes from integer score bands on the
  * 1-to-10 scale the schema documents for Review.score; themes are the most
  * frequent meaningful words across the comments. Deliberately simple: the
  * interesting path is sampling, and this one only has to be honest.
