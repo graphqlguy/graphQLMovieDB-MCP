@@ -45,7 +45,7 @@ public class SamplingReviewSummarizer {
         if (context.sampleEnabled()) {
             CreateMessageResult result = context.sample(s -> s
                 .message(prompt)
-                .systemPrompt("You summarize movie reviews into a short prose synthesis and recurring themes.")
+                .systemPrompt("You summarize movie reviews into a few sentences and recurring themes.")
                 .maxTokens(1024));
             String text = result.content() instanceof TextContent tc ? tc.text() : "";
             return parseSummary(movieId, reviews.size(), averageScore, text);
