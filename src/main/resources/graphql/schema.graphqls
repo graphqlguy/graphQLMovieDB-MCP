@@ -58,7 +58,7 @@ type Query {
     """
     Returns a summary of user reviews for a given movie, computed server-side
     from the underlying review corpus (integer scores from 1 to 10 plus
-    free-text comments). The summary includes a short prose synthesis of what
+    free-text comments). The result includes a short summary of what
     reviewers said, recurring themes pulled from the review text, and the
     mean of the review scores.
 
@@ -66,7 +66,7 @@ type Query {
     unknown ids produce a NOT_FOUND error instead of a null result, so null
     is not a possible outcome for this field. When there are reviews but
     fewer than three of them, the system has insufficient material to
-    produce a meaningful prose summary, so `summary` is null; `reviewCount`
+    produce a meaningful summary, so `summary` is null; `reviewCount`
     still says how many reviews exist. When there are zero reviews,
     `reviewCount` is zero, `themes` is empty, and both `summary` and
     `averageScore` are null.
@@ -162,8 +162,8 @@ type Movie implements Content {
 
     """
     The directors on record for this movie. An empty list means the catalog
-    does not have a director recorded for the title, not that the film did
-    not have one.
+    does not have a director on record for the title, not that the film
+    never had one.
     """
     directors: [Person!]!
 
@@ -608,8 +608,7 @@ enum Mood {
 }
 
 """
-A server-computed snapshot of a movie's review corpus: a short prose
-synthesis of what reviewers said, plus the recurring themes and the mean
+A server-computed snapshot of a movie's review corpus: a short summary of what reviewers said, plus the recurring themes and the mean
 score behind it.
 """
 type MovieReviewSummary {
@@ -617,7 +616,7 @@ type MovieReviewSummary {
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means the movie does not have any reviews."""
     reviewCount: Int!
-    """A short prose synthesis of what reviewers said. Null when there are too few reviews to write one; read reviewCount to see how many there were."""
+    """A short summary of what reviewers said. Null when there are too few reviews to write one; read reviewCount to see how many there were."""
     summary: String
     """Recurring themes pulled from the review text. Empty when reviewCount is zero or none were identified."""
     themes: [String!]!
