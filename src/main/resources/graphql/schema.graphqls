@@ -59,7 +59,7 @@ type Query {
     """
     Returns a structured summary of user reviews for a given movie, computed
     server-side from the underlying review corpus (integer scores from 1 to 10
-    plus free-text comments). The summary includes a short prose synthesis of
+    plus free-text comments). The result includes a short summary of
     what reviewers said and recurring themes pulled from the review text.
 
     Always returns a non-null `MovieReviewSummary` for a movie that exists;
@@ -166,8 +166,8 @@ type Movie implements Content {
 
     """
     The directors on record for this movie. An empty list means the catalog
-    does not have a director recorded for the title, not that the film did
-    not have one.
+    does not have a director on record for the title, not that the film
+    never had one.
     """
     directors: [Person!]!
 
@@ -613,14 +613,14 @@ enum Mood {
 
 """
 A server-computed snapshot of a movie's review corpus, built around a short
-prose synthesis instead of a sentiment label.
+summary instead of a sentiment label.
 """
 type MovieReviewSummary {
     """The id of the summarized movie, echoing the operation's argument."""
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means the movie does not have any reviews."""
     reviewCount: Int!
-    """A short prose synthesis of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
+    """A short summary of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
     summary: String
     """Recurring themes pulled from the review text. Empty when reviewCount is zero."""
     themes: [String!]!
