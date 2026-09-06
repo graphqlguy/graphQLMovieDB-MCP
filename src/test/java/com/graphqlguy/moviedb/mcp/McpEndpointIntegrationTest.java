@@ -1,6 +1,8 @@
 package com.graphqlguy.moviedb.mcp;
 
 import com.graphqlguy.moviedb.movie.MovieRepository;
+import com.graphqlguy.moviedb.user.UserRepository;
+import com.graphqlguy.moviedb.watchlist.WatchlistItemRepository;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
@@ -34,10 +36,10 @@ class McpEndpointIntegrationTest {
     McpSyncClient client;
 
     @Autowired
-    com.graphqlguy.moviedb.watchlist.WatchlistItemRepository watchlistItemRepository;
+    WatchlistItemRepository watchlistItemRepository;
 
     @Autowired
-    com.graphqlguy.moviedb.user.UserRepository userRepository;
+    UserRepository userRepository;
 
     @BeforeEach
     void connect() {
