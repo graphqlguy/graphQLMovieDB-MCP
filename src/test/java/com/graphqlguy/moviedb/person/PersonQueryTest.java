@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,7 +52,7 @@ class PersonQueryTest {
                         mutation CreatePerson($input: CreatePersonInput!) {
                           createPerson(input: $input) { id }
                         }""")
-                .variable("input", java.util.Map.of("name", "Test", "countryCode", "XX"))
+                .variable("input", Map.of("name", "Test", "countryCode", "XX"))
                 .execute()
                 .errors().satisfy(errors -> assertThat(errors)
                         .anySatisfy(error -> assertThat(error.getMessage()).contains("XX")));
