@@ -2,7 +2,7 @@
 
 This branch is the repository state at the end of [Class 14: When DIY Pays Off](https://graphqlguy.com/docs/tutorial-graphql-mcp/when-diy-pays-off), part of the [GraphQL + MCP course](https://graphqlguy.com/docs/tutorial-graphql-mcp/mcp-and-graphql).
 
-**What Class 14 adds:** no new code, since the class compares the three tracks; one schema description is reworded.
+**What Class 14 adds:** no code. The class weighs the three tracks built so far, Apollo MCP Server, the Spring AI starter, and the hand-built server, so this branch is the checkpoint the next class starts from.
 
 **Following along:** start from `mcp_class_13`, work through the lesson, then compare your result with this branch. The next class continues on `mcp_class_15`.
 
@@ -39,7 +39,7 @@ Each branch is the repository state at the end of one class. [Class 1](https://g
 | `mcp_class_11` | [Class 11: Elicitation and Sampling](https://graphqlguy.com/docs/tutorial-graphql-mcp/elicitation-and-sampling) | sampling, elicitation, and the server-side fallback |
 | `mcp_class_12` | [Class 12: Testing the Spring AI MCP Server](https://graphqlguy.com/docs/tutorial-graphql-mcp/testing) | the four levels of tests |
 | `mcp_class_13` | [Class 13: Building MCP From the Protocol Up](https://graphqlguy.com/docs/tutorial-graphql-mcp/diy-mcp-from-protocol) | JSON-RPC by hand in `diymcp/` |
-| `mcp_class_14` | [Class 14: When DIY Pays Off](https://graphqlguy.com/docs/tutorial-graphql-mcp/when-diy-pays-off) | no new code; one description reworded |
+| `mcp_class_14` | [Class 14: When DIY Pays Off](https://graphqlguy.com/docs/tutorial-graphql-mcp/when-diy-pays-off) | no code; the class weighs the three tracks |
 | `mcp_class_15` | [Class 15: OAuth 2.1 Resource Server](https://graphqlguy.com/docs/tutorial-graphql-mcp/oauth2-resource-server) | OAuth 2.1 on `/mcp` |
 | `mcp_class_16` | [Class 16: Agent-Specific Security](https://graphqlguy.com/docs/tutorial-graphql-mcp/agent-specific-security) | stage-and-confirm writes, audit, rate limits |
 | `mcp_class_17` | [Class 17: Observability and Deployment](https://graphqlguy.com/docs/tutorial-graphql-mcp/observability-and-deployment) | tool metrics, cost, production profile |
