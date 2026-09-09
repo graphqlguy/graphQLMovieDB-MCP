@@ -35,10 +35,10 @@ type Query {
     Suitable for low-stakes recommendation flows ("I want something fun tonight")
     where the user benefits from a curated suggestion instead of an exhaustive
     search. Results are ranked by rating, highest first, with a stable tiebreak
-    on id, so repeated calls return the same order; an agent that retries sees
-    the same ordering and does not need to reason about result drift. Returns
-    an empty list (never null) when the catalog does not contain any matches
-    for the mood; an empty list is a valid answer, not a failure.
+    on id, so an agent that retries sees the same ordering and does not need to
+    reason about result drift. Returns an empty list (never null) when the
+    catalog does not contain any matches for the mood; an empty list is a valid
+    answer, not a failure.
     """
     recommendMoviesForMood(
         """
@@ -612,8 +612,9 @@ enum Mood {
 }
 
 """
-A structured summary of the user reviews for one movie, computed server-side
-from the review corpus.
+A server-computed snapshot of a movie's review corpus: a short summary of
+what reviewers said, plus the recurring themes and the mean score it was
+computed from.
 """
 type MovieReviewSummary {
     """The id of the summarized movie, echoing the operation's argument."""
