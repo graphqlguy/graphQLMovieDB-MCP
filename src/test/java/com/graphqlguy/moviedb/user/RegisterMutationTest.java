@@ -25,7 +25,7 @@ class RegisterMutationTest {
     HttpGraphQlTester graphQlTester;
 
     @Test
-    void register_createsUserAndReturnsToken() {
+    void register_shouldCreateUserAndReturnsToken() {
         graphQlTester.document(REGISTER)
                 .variable("input", Map.of("username", "newuser", "email", "new@example.com", "password", "secret123"))
                 .execute()
@@ -35,7 +35,7 @@ class RegisterMutationTest {
     }
 
     @Test
-    void register_tokenWorksForAuthenticatedMutations() {
+    void register_shouldReturnATokenThatWorksForAuthenticatedMutations() {
         String token = graphQlTester.document(REGISTER)
                 .variable("input", Map.of("username", "reviewer2", "email", "reviewer2@example.com", "password", "secret123"))
                 .execute().path("register.token").entity(String.class).get();
@@ -49,7 +49,7 @@ class RegisterMutationTest {
     }
 
     @Test
-    void register_duplicateUsername_isRejected() {
+    void register_duplicateUsername_shouldBeRejected() {
         graphQlTester.document(REGISTER)
                 .variable("input", Map.of("username", "admin", "email", "other@example.com", "password", "secret123"))
                 .execute()
@@ -58,7 +58,7 @@ class RegisterMutationTest {
     }
 
     @Test
-    void register_shortPassword_isRejectedBySchemaValidation() {
+    void register_shortPassword_shouldBeRejectedBySchemaValidation() {
         graphQlTester.document(REGISTER)
                 .variable("input", Map.of("username", "shorty", "email", "shorty@example.com", "password", "abc"))
                 .execute()
@@ -67,7 +67,7 @@ class RegisterMutationTest {
     }
 
     @Test
-    void register_invalidEmail_isRejectedBySchemaValidation() {
+    void register_invalidEmail_shouldBeRejectedBySchemaValidation() {
         graphQlTester.document(REGISTER)
                 .variable("input", Map.of("username", "bademail", "email", "not-an-email", "password", "secret123"))
                 .execute()
