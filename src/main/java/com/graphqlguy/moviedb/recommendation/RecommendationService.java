@@ -45,8 +45,8 @@ public class RecommendationService {
             return Set.of();
         }
         return watchlistRepository.findWithContentByUserId(viewer.getId()).stream()
-            .filter(item -> item.getStatus() == WatchStatus.WATCHED && item.getMovie() != null)
-            .map(item -> item.getMovie().getId())
-            .collect(Collectors.toSet());
+                .filter(item -> item.getStatus() == WatchStatus.WATCHED && item.getMovie() != null)
+                .map(item -> item.getMovie().getId())
+                .collect(Collectors.toSet());
     }
 }
