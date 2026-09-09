@@ -35,9 +35,10 @@ type Query {
     Suitable for low-stakes recommendation flows ("I want something fun tonight")
     where the user benefits from a curated suggestion instead of an exhaustive
     search. Results are ranked by rating, highest first, with a stable tiebreak
-    on id, so repeated calls return the same order. Returns an empty list
-    (never null) when the catalog does not contain any matches for the mood;
-    an empty list is a valid answer, not a failure.
+    on id, so an agent that retries sees the same ordering and does not need to
+    reason about result drift. Returns an empty list (never null) when the
+    catalog does not contain any matches for the mood; an empty list is a valid
+    answer, not a failure.
     """
     recommendMoviesForMood(
         """
@@ -56,20 +57,23 @@ type Query {
     ): [Movie!]!
 
     """
-    Returns a summary of user reviews for a given movie, computed server-side
-    from the underlying review corpus (integer scores from 1 to 10 plus
-    free-text comments). The result includes a short summary of what
-    reviewers said, recurring themes pulled from the review text, and the
-    mean of the review scores.
+    Returns a structured summary of user reviews for a given movie, computed
+    server-side from the underlying review corpus (integer scores from 1 to 10
+    plus free-text comments). The result includes a short summary of
+    what reviewers said and recurring themes pulled from the review text.
 
     Always returns a non-null `MovieReviewSummary` for a movie that exists;
-    unknown ids produce a NOT_FOUND error instead of a null result, so null
-    is not a possible outcome for this field. When there are reviews but
-    fewer than three of them, the system has insufficient material to
-    produce a meaningful summary, so `summary` is null; `reviewCount`
-    still says how many reviews exist. When there are zero reviews,
-    `reviewCount` is zero, `themes` is empty, and both `summary` and
-    `averageScore` are null.
+    unknown ids produce a NOT_FOUND error instead of a null result, so this
+    field never returns null. When there are fewer than three reviews, the
+    system has insufficient material to produce a meaningful `summary`, so
+    that field is null and the agent should read `reviewCount` to see how
+    many there were; `averageScore` is null only when `reviewCount` is zero.
+
+    When there are zero reviews, the operation still returns a
+    `MovieReviewSummary` whose `reviewCount` is zero, whose `summary` and
+    `averageScore` are null, and whose `themes` list is empty, so the agent
+    can distinguish "no reviews exist" from "fewer than three reviews exist"
+    by inspecting the result shape instead of guessing from null alone.
     """
     summarizeMovieReviews(
         """
@@ -608,17 +612,18 @@ enum Mood {
 }
 
 """
-A server-computed snapshot of a movie's review corpus: a short summary of what reviewers said, plus the recurring themes and the mean
-score behind it.
+A server-computed snapshot of a movie's review corpus: a short summary of
+what reviewers said, plus the recurring themes and the mean score it was
+computed from.
 """
 type MovieReviewSummary {
     """The id of the summarized movie, echoing the operation's argument."""
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means the movie does not have any reviews."""
     reviewCount: Int!
-    """A short summary of what reviewers said. Null when there are too few reviews to write one; read reviewCount to see how many there were."""
+    """A short summary of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
     summary: String
-    """Recurring themes pulled from the review text. Empty when reviewCount is zero or none were identified."""
+    """Recurring themes pulled from the review text. Empty when reviewCount is zero."""
     themes: [String!]!
     """Mean of the 1-to-10 review scores. Null only when reviewCount is zero."""
     averageScore: Float
