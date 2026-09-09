@@ -35,7 +35,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void createReview_forMovie_succeeds() {
+    void createReview_forMovie_shouldSucceed() {
         loggedInAs("user", "user123")
                 .document(CREATE_REVIEW)
                 .variable("input", Map.of("subject", Map.of("movieId", "1"), "score", 9, "comment", "Classic."))
@@ -45,7 +45,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void createReview_forTvShow_succeedsAndAppearsOnShow() {
+    void createReview_forTvShow_shouldSucceedAndAppearsOnShow() {
         loggedInAs("user", "user123")
                 .document(CREATE_REVIEW)
                 .variable("input", Map.of("subject", Map.of("tvShowId", "1"), "score", 10, "comment", "Still funny."))
@@ -59,7 +59,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void createReview_withBothTargets_isRejectedByOneOf() {
+    void createReview_withBothTargets_shouldBeRejectedByOneOf() {
         loggedInAs("user", "user123")
                 .document(CREATE_REVIEW)
                 .variable("input", Map.of("subject", Map.of("movieId", "1", "tvShowId", "1"), "score", 5))
@@ -69,7 +69,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void createReview_withNoTarget_isRejectedByOneOf() {
+    void createReview_withNoTarget_shouldBeRejectedByOneOf() {
         loggedInAs("user", "user123")
                 .document(CREATE_REVIEW)
                 .variable("input", Map.of("subject", Map.of(), "score", 5))
@@ -79,7 +79,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void createReview_duplicateForSameShow_isRejected() {
+    void createReview_duplicateForSameShow_shouldBeRejected() {
         HttpGraphQlTester admin = loggedInAs("admin", "admin123");
         admin.document(CREATE_REVIEW)
                 .variable("input", Map.of("subject", Map.of("tvShowId", "2"), "score", 8))
@@ -94,7 +94,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void reviewCount_reflectsNumberOfReviews() {
+    void reviewCount_shouldReflectNumberOfReviews() {
         graphQlTester.document("{ movie(id: 45) { reviewCount } }")
                 .execute()
                 .path("movie.reviewCount").entity(Integer.class).isEqualTo(0);
@@ -111,7 +111,7 @@ class ReviewMutationTest {
     }
 
     @Test
-    void createReview_scoreOutOfRange_isRejectedBySchemaValidation() {
+    void createReview_scoreOutOfRange_shouldBeRejectedBySchemaValidation() {
         loggedInAs("user", "user123")
                 .document(CREATE_REVIEW)
                 .variable("input", Map.of("subject", Map.of("movieId", "2"), "score", 11))
