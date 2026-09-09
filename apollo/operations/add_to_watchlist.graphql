@@ -1,9 +1,10 @@
 # Add a movie or TV show to the signed-in user's watch list.
 # Provide exactly one of subject.movieId or subject.tvShowId. Omit status
 # unless the user says they have already seen the title; the server defaults
-# to WANT_TO_WATCH. Not idempotent: adding a title that is already on the
-# list fails with a validation error, so never retry a call that succeeded,
-# and treat an "already in your watch list" error as success, not failure.
+# to WANT_TO_WATCH. State-idempotent but not response-idempotent: a repeat
+# add can never create a second row, but it returns an "already in your
+# watch list" error instead of the entry; treat that error as success, not
+# failure, and never retry it.
 mutation AddToWatchlist($subject: WatchlistSubjectInput!, $status: WatchStatus) {
   addToWatchlist(subject: $subject, status: $status) {
     id
