@@ -39,7 +39,7 @@ class MovieReviewSummaryServiceTest {
     }
 
     @Test
-    void manyReviewsProduceAProseSummary() {
+    void summarize_movieWithManyReviews_shouldReturnASummaryAndAScore() {
         MovieReviewSummary s = service.summarize(shawshankId);
         assertThat(s.reviewCount()).isGreaterThanOrEqualTo(3);
         assertThat(s.summary()).isNotBlank();
@@ -47,7 +47,7 @@ class MovieReviewSummaryServiceTest {
     }
 
     @Test
-    void tooFewReviewsOmitTheSummaryButKeepTheScore() {
+    void summarize_movieWithTooFewReviews_shouldOmitTheSummaryAndKeepTheScore() {
         MovieReviewSummary s = service.summarize(godfatherId);
         assertThat(s.reviewCount()).isBetween(1, 2);
         assertThat(s.summary()).isNull();
@@ -55,7 +55,7 @@ class MovieReviewSummaryServiceTest {
     }
 
     @Test
-    void noReviewsOmitBothSummaryAndScore() {
+    void summarize_movieWithNoReviews_shouldOmitBothSummaryAndScore() {
         MovieReviewSummary s = service.summarize(movieWithNoReviewsId);
         assertThat(s.reviewCount()).isZero();
         assertThat(s.summary()).isNull();
@@ -63,7 +63,7 @@ class MovieReviewSummaryServiceTest {
     }
 
     @Test
-    void unknownMovieRaisesNotFound() {
+    void summarize_unknownMovieId_shouldRaiseNotFound() {
         assertThatThrownBy(() -> service.summarize(999_999L))
             .isInstanceOf(EntityNotFoundException.class);
     }
