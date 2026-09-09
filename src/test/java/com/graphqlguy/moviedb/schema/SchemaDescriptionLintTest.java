@@ -61,7 +61,7 @@ class SchemaDescriptionLintTest {
     GraphQlSource graphQlSource;
 
     @Test
-    void everyFieldOnEveryUserDefinedTypeHasADescription() {
+    void everyFieldOnEveryUserDefinedType_shouldHaveADescription() {
         GraphQLSchema schema = graphQlSource.schema();
         List<String> missing = new ArrayList<>();
 

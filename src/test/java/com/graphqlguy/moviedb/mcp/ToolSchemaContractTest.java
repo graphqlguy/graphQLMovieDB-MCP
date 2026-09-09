@@ -24,7 +24,7 @@ class ToolSchemaContractTest {
     @Autowired ObjectMapper mapper;
 
     @Test
-    void toolSchemasMatchSnapshot() throws Exception {
+    void toolSchemas_shouldMatchTheSnapshot() throws Exception {
         var transport = HttpClientStreamableHttpTransport
             .builder("http://localhost:" + port)
             .endpoint("/mcp")
