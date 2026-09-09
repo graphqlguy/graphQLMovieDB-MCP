@@ -56,24 +56,29 @@ type Query {
     ): [Movie!]!
 
     """
-    Returns a summary of user reviews for a given movie, computed server-side
-    from the underlying review corpus (integer scores from 1 to 10 plus
-    free-text comments). Always returns a non-null `MovieReviewSummary` for a
-    movie that exists; null never appears as a result, because an id that does
-    not reference an existing movie produces a NOT_FOUND error instead.
+    Returns a structured summary of user reviews for a given movie, computed
+    server-side from the underlying review corpus (integer scores from 1 to 10
+    plus free-text comments). The result includes a short summary of
+    what reviewers said and recurring themes pulled from the review text.
 
-    When the movie has fewer than three reviews, the corpus is too small to
-    summarize, so `summary` is null; `reviewCount` still reports
-    the exact number on record, so the agent can decide whether to wait for
-    more reviews or read `Movie.reviews` directly. When there are zero
-    reviews, `reviewCount` is zero, `summary` and `averageScore` are both
-    null, and `themes` is an empty list.
+    Always returns a non-null `MovieReviewSummary` for a movie that exists;
+    unknown ids produce a NOT_FOUND error instead of a null result, so this
+    field never returns null. When there are fewer than three reviews, the
+    system has insufficient material to produce a meaningful `summary`, so
+    that field is null and the agent should read `reviewCount` to see how
+    many there were; `averageScore` is null only when `reviewCount` is zero.
+
+    When there are zero reviews, the operation still returns a
+    `MovieReviewSummary` whose `reviewCount` is zero, whose `summary` and
+    `averageScore` are null, and whose `themes` list is empty, so the agent
+    can distinguish "no reviews exist" from "fewer than three reviews exist"
+    by inspecting the result shape instead of guessing from null alone.
     """
     summarizeMovieReviews(
         """
         The id of the movie whose reviews should be summarized. Must reference
-        an existing movie; unknown ids produce a NOT_FOUND error instead of
-        a null result, so this field never returns null.
+        an existing movie; unknown ids produce a NOT_FOUND error instead of a
+        null result, so this field never returns null.
         """
         movieId: ID!
     ): MovieReviewSummary!
@@ -615,10 +620,10 @@ type MovieReviewSummary {
     movieId: ID!
     """Number of reviews the summary was computed from. Zero means the movie does not have any reviews."""
     reviewCount: Int!
-    """A short summary of what reviewers said. Null when reviewCount is below three, the minimum the summary needs to say something meaningful; read reviewCount to see how many there were."""
+    """A short summary of what reviewers said. Null when there are fewer than three reviews to write one from; read reviewCount to see how many there were."""
     summary: String
-    """Recurring themes pulled from the review text. Empty when reviewCount is zero or no theme was identified."""
+    """Recurring themes pulled from the review text. Empty when reviewCount is zero."""
     themes: [String!]!
-    """Mean of the 1-to-10 review scores. Null when reviewCount is zero."""
+    """Mean of the 1-to-10 review scores. Null only when reviewCount is zero."""
     averageScore: Float
 }
