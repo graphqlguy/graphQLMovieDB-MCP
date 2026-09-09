@@ -83,7 +83,8 @@ public class MovieMcpTools {
             Recommend movies that fit a given mood. Suitable for low-stakes
             recommendation flows where an agent is asking on behalf of a user.
             Results are ranked by rating, highest first, with a stable
-            tiebreak on id, so repeated calls return the same order.
+            tiebreak on id, so repeated calls return the same order and an
+            agent that retries does not see the list reshuffle under it.
             """,
         annotations = @McpTool.McpAnnotations(
             title = "Recommend Movies For Mood",
@@ -114,13 +115,12 @@ public class MovieMcpTools {
         name = "summarizeMovieReviews",
         description = """
             Summarize user reviews for a specific movie. Always returns a
-            result for a movie that exists; an unknown movie id fails the
-            call instead. When there are fewer than three reviews, the
-            summary field is null and reviewCount says how many reviews
-            exist; agents should treat that as "not enough data," not "no
-            reviews exist." Use this only after the user has identified a
-            movie they care about; do not call speculatively across many
-            movies.
+            summary object for a movie that exists; an unknown movie id
+            fails with a NOT_FOUND error. When there are fewer than three
+            reviews, the summary field is null and the agent should read
+            reviewCount to see how many there were. Use this only after
+            the user has identified a movie they care about; do not call
+            speculatively across many movies.
             """,
         annotations = @McpTool.McpAnnotations(
             title = "Summarize Movie Reviews",
