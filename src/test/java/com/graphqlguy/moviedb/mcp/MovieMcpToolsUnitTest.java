@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class MovieMcpToolsUnitTest {
 
     @Test
-    void recommendMoviesForMood_returnsCuratedMovies() {
+    void recommendMoviesForMood_shouldReturnCuratedMovies() {
         ExecutionGraphQlService graphql = Mockito.mock(ExecutionGraphQlService.class);
         ExecutionGraphQlResponse response = Mockito.mock(ExecutionGraphQlResponse.class);
         ResponseField field = Mockito.mock(ResponseField.class);
