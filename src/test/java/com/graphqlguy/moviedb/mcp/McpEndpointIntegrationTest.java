@@ -68,7 +68,7 @@ class McpEndpointIntegrationTest {
     }
 
     @Test
-    void toolsListIncludesAllRegisteredTools() {
+    void toolsList_shouldIncludeAllRegisteredTools() {
         McpSchema.ListToolsResult tools = client.listTools();
 
         assertThat(tools.tools())
@@ -78,7 +78,7 @@ class McpEndpointIntegrationTest {
     }
 
     @Test
-    void recommendMoviesForMoodEndToEnd() {
+    void recommendMoviesForMood_shouldWorkEndToEnd() {
         McpSchema.CallToolResult result = client.callTool(
             new McpSchema.CallToolRequest("recommendMoviesForMood",
                 Map.of("input", Map.of("mood", "COMFORT", "excludeWatched", false))));
@@ -93,7 +93,7 @@ class McpEndpointIntegrationTest {
     // with no prior watchlist entries, so a fresh add can only fail on
     // identity, not on the duplicate-title rule exercised below.
     @Test
-    void addToWatchlistEndToEndAsAuthenticatedUser() {
+    void addToWatchlist_authenticatedUser_shouldAddTheMovie() {
         Long movieId = movieRepository.findByTitleContainingIgnoreCase("Inception")
             .get(0).getId();
         McpSyncClient mara = clientAs("mara");
@@ -116,7 +116,7 @@ class McpEndpointIntegrationTest {
     // rejected during the MCP session handshake itself, before a tool call is
     // even possible.
     @Test
-    void addToWatchlistRefusesUnauthenticatedCaller() {
+    void addToWatchlist_shouldRefuseUnauthenticatedCaller() {
         assertThatThrownBy(() -> clientAs(null))
             .hasMessageContaining("Client failed to initialize");
     }
@@ -131,7 +131,7 @@ class McpEndpointIntegrationTest {
     // promises callers ("... fails with an \"already in your watch list\"
     // error").
     @Test
-    void addToWatchlistStillRejectsDuplicateAdd() {
+    void addToWatchlist_titleAlreadyOnTheList_shouldReturnTheDuplicateError() {
         Long movieId = movieRepository.findByTitleContainingIgnoreCase("Shawshank")
             .get(0).getId();
         McpSyncClient user = clientAs("user");
@@ -157,7 +157,7 @@ class McpEndpointIntegrationTest {
     // failing loudly: the tool reports an error the user reads as a permission
     // problem on their own data.
     @Test
-    void stageAndConfirmActuallyRemovesTheItem() {
+    void stageAndConfirm_ownWatchlistItem_shouldRemoveTheRow() {
         McpSyncClient user = clientAs("user");
         try {
             Long userId = userRepository.findByUsername("user").orElseThrow().getId();
