@@ -27,7 +27,7 @@ class SubscriptionTest {
     ExecutionGraphQlService graphQlService;
 
     @Test
-    void reviewAdded_pushesNotificationWhenReviewIsCreated() throws Exception {
+    void reviewAdded_shouldPushNotificationWhenReviewIsCreated() throws Exception {
         GraphQlTester subscriptionTester = ExecutionGraphQlServiceTester.create(graphQlService);
         Flux<GraphQlTester.Response> notifications = subscriptionTester.document("""
                         subscription { reviewAdded { title movieId review { score user { username } } } }

@@ -34,7 +34,7 @@ class MovieSliceTest {
     MovieService movieService;
 
     @Test
-    void movie_resolvesFieldsFromTheService() {
+    void movie_shouldResolveFieldsFromTheService() {
         Movie movie = Movie.builder().id(1L).title("Inception").releaseYear(2010).build();
         when(movieService.findById(1L)).thenReturn(movie);
 

@@ -40,7 +40,7 @@ class MovieMutationTest {
     }
 
     @Test
-    void createMovie_asAdmin_createsMovie() {
+    void createMovie_asAdmin_shouldCreateMovie() {
         loggedInAs("admin", "admin123")
                 .document(CREATE_MOVIE)
                 .variable("input", Map.of("title", "Test Movie", "releaseYear", 2020, "genre", "DRAMA", "rating", 7.5))
@@ -51,7 +51,7 @@ class MovieMutationTest {
     }
 
     @Test
-    void createMovie_releaseYearOutOfRange_isRejectedBySchemaValidation() {
+    void createMovie_releaseYearOutOfRange_shouldBeRejectedBySchemaValidation() {
         loggedInAs("admin", "admin123")
                 .document(CREATE_MOVIE)
                 .variable("input", Map.of("title", "Ancient Movie", "releaseYear", 1700, "genre", "DRAMA"))
@@ -61,7 +61,7 @@ class MovieMutationTest {
     }
 
     @Test
-    void createMovie_ratingOutOfRange_isRejectedBySchemaValidation() {
+    void createMovie_ratingOutOfRange_shouldBeRejectedBySchemaValidation() {
         loggedInAs("admin", "admin123")
                 .document(CREATE_MOVIE)
                 .variable("input", Map.of("title", "Overrated", "releaseYear", 2020, "genre", "DRAMA", "rating", 11.0))
@@ -71,7 +71,7 @@ class MovieMutationTest {
     }
 
     @Test
-    void createMovie_titleTooLong_isRejectedBySchemaValidation() {
+    void createMovie_titleTooLong_shouldBeRejectedBySchemaValidation() {
         loggedInAs("admin", "admin123")
                 .document(CREATE_MOVIE)
                 .variable("input", Map.of("title", "X".repeat(201), "releaseYear", 2020, "genre", "DRAMA"))
@@ -81,7 +81,7 @@ class MovieMutationTest {
     }
 
     @Test
-    void updateMovie_partialUpdate_changesOnlyGivenFields() {
+    void updateMovie_partialUpdate_shouldChangeOnlyGivenFields() {
         HttpGraphQlTester admin = loggedInAs("admin", "admin123");
         String id = admin.document(CREATE_MOVIE)
                 .variable("input", Map.of("title", "To Update", "releaseYear", 2001, "genre", "DRAMA", "rating", 5.0))
@@ -96,7 +96,7 @@ class MovieMutationTest {
     }
 
     @Test
-    void createMovie_asRegularUser_isForbidden() {
+    void createMovie_asRegularUser_shouldBeForbidden() {
         loggedInAs("user", "user123")
                 .document(CREATE_MOVIE)
                 .variable("input", Map.of("title", "Sneaky", "releaseYear", 2020, "genre", "DRAMA"))
