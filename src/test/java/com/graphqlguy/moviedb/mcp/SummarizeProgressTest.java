@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SummarizeProgressTest {
 
     @Test
-    void summarizeMovieReviews_returnsSummary() {
+    void summarizeMovieReviews_shouldReturnSummary() {
         MovieMcpTools tools = withMockedDependencies();
         McpSyncRequestContext context = Mockito.mock(McpSyncRequestContext.class);
 
