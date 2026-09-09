@@ -39,7 +39,7 @@ class McpEndpointIntegrationTest {
     }
 
     @Test
-    void toolsListIncludesAllRegisteredTools() {
+    void toolsList_shouldIncludeAllRegisteredTools() {
         McpSchema.ListToolsResult tools = client.listTools();
 
         assertThat(tools.tools())
@@ -49,7 +49,7 @@ class McpEndpointIntegrationTest {
     }
 
     @Test
-    void recommendMoviesForMoodEndToEnd() {
+    void recommendMoviesForMood_shouldWorkEndToEnd() {
         McpSchema.CallToolResult result = client.callTool(
             new McpSchema.CallToolRequest("recommendMoviesForMood",
                 Map.of("input", Map.of("mood", "COMFORT", "excludeWatched", false))));
