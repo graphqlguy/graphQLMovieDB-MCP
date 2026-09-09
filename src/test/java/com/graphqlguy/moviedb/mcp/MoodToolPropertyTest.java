@@ -11,7 +11,7 @@ class MoodToolPropertyTest {
 
     @ParameterizedTest
     @EnumSource(Mood.class)
-    void recommendMoviesForMood_acceptsEveryMoodValue(Mood mood) {
+    void recommendMoviesForMood_shouldAcceptEveryMoodValue(Mood mood) {
         assertThatCode(() -> {
             MovieMcpTools tools = withMockedGraphQl();
             tools.recommendMoviesForMood(new RecommendInput(mood, false));
