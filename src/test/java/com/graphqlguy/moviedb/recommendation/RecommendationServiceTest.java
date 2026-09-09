@@ -18,7 +18,7 @@ class RecommendationServiceTest {
     private RecommendationService service;
 
     @Test
-    void differentMoodsReturnDifferentMovies() {
+    void recommendForMood_twoDifferentMoods_shouldReturnDifferentMovies() {
         List<Movie> horror = service.recommendForMood(Mood.HORROR, false, null);
         List<Movie> comedy = service.recommendForMood(Mood.COMEDY, false, null);
 
@@ -28,7 +28,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void horrorOnlyReturnsMoodAppropriateGenres() {
+    void recommendForMood_horror_shouldReturnOnlyGenresInThatMoodProfile() {
         List<Movie> horror = service.recommendForMood(Mood.HORROR, false, null);
 
         assertThat(horror)
@@ -37,7 +37,7 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void noTwoMoodsReturnTheSameResultList() {
+    void recommendForMood_everyMood_shouldReturnAListNoOtherMoodReturns() {
         Map<Mood, List<Movie>> resultsByMood = new EnumMap<>(Mood.class);
         for (Mood mood : Mood.values()) {
             resultsByMood.put(mood, service.recommendForMood(mood, false, null));
