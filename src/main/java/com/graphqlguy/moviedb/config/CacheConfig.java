@@ -36,7 +36,7 @@ public class CacheConfig {
     }
 
     /**
-     * Sixty seconds so the effect is visible inside one class. A production
+     * Sixty seconds so the effect is visible within one lesson. A production
      * deployment would use hours, because a summary only changes when the
      * review set does.
      */
