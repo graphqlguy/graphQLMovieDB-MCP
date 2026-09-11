@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Class 18: attaches a bearer token to every outgoing MCP request, for talking
- * to the OAuth-protected /mcp endpoint Class 15 built. No configuration
- * property sets an Authorization header on the transport, so the seam is a
- * customizer the transport auto-configuration applies to its builder.
+ * to the OAuth-protected /mcp endpoint Class 15 built. The transport does not
+ * have a configuration property for an Authorization header, so this class adds a
+ * customizer that the transport auto-configuration applies to its builder.
  *
  * Conditional on the property, so an unprotected server needs no change: leave
  * moviedb.mcp.token unset and this bean never exists.

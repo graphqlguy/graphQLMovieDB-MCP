@@ -37,10 +37,10 @@ public class McpSecurityConfig {
     @Order(1)
     SecurityFilterChain mcpFilterChain(HttpSecurity http) throws Exception {
         // RFC 9728 section 5.1: a 401 from a protected resource should carry a
-        // WWW-Authenticate header with a resource_metadata parameter so a
-        // tokenless client learns where the discovery document lives. Spring's
-        // default BearerTokenAuthenticationEntryPoint emits a bare challenge, so
-        // we replace it.
+        // WWW-Authenticate header with a resource_metadata parameter, which
+        // tells a client without a token where the metadata document is.
+        // Spring's default BearerTokenAuthenticationEntryPoint sends a plain
+        // Bearer challenge without that parameter, so we replace it.
         AuthenticationEntryPoint entryPoint = (request, response, authException) -> {
             response.setHeader(HttpHeaders.WWW_AUTHENTICATE,
                 "Bearer resource_metadata=" +
@@ -68,9 +68,9 @@ public class McpSecurityConfig {
                 .jwt(jwt -> {})
                 // Spring Security serves the RFC 9728 document itself, from a
                 // filter that runs ahead of the DispatcherServlet. Describing
-                // the resource here is the only way to reach that document; a
-                // @RestController mapped to the same paths would be shadowed
-                // by the filter and never called.
+                // the resource here is the only way to change that document. A
+                // @RestController mapped to the same paths is bypassed, because
+                // the filter answers those requests first.
                 .protectedResourceMetadata(metadata -> metadata
                     .protectedResourceMetadataCustomizer(builder -> builder
                         .resource(resource)
