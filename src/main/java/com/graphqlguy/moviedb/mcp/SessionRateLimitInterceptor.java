@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Class 16: a token bucket per authenticated principal, refined by session id
  * when present. Keying starts from the verified principal (the JWT sub) instead
  * of the client-supplied Mcp-Session-Id, because keying on a rotatable header
- * alone would let a misbehaving client mint a fresh bucket per request.
+ * alone would let a misbehaving client create a fresh bucket per request.
  */
 @Component
 public class SessionRateLimitInterceptor implements HandlerInterceptor {
