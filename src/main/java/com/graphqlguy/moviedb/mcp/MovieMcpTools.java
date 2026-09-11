@@ -148,8 +148,8 @@ public class MovieMcpTools {
     public MovieReviewSummary summarizeMovieReviews(
             // Class 10: both special parameters are filled in by the framework
             // and never appear in the tool's input schema. context.progress(...)
-            // reads the client's token on its own and quietly no-ops when
-            // the client did not send one.
+            // reads the client's token on its own and skips the notification
+            // when the client did not send one.
             McpSyncRequestContext context,
             @McpProgressToken String progressToken,
             @McpToolParam(description = "Movie ID, as it appears in the schema.", required = true)
