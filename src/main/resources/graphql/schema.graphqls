@@ -353,9 +353,9 @@ type Mutation {
     created entry.
 
     Duplicate contract: each user can hold a given title at most once, enforced
-    by the database. Calling this for a title already on the list changes
-    nothing and fails with a BAD_REQUEST error whose message says the title is
-    already in the watch list. Agents should treat that specific error as
+    by the database. Calling this for a title already on the list leaves
+    the list unchanged and fails with a BAD_REQUEST error whose message says the
+    title is already in the watch list. Agents should treat that specific error as
     confirmation that the goal state already holds, not as a failure to report
     or retry.
 
@@ -579,18 +579,18 @@ type DeleteReviewResponse {
 """
 Available mood categories. Bounded by design so an agent cannot supply
 free-text moods that would force fuzzy matching on the server. Add a
-new value here and update the recommendation engine in the same change;
-unannotated values are a maintenance hazard.
+new value here and update the recommendation engine in the same change.
+Give every value a description, because an agent picks a mood by reading it.
 """
 enum Mood {
     """
     Familiar, low-stakes films the viewer has likely seen before and would
-    watch again on a rainy Sunday. Warm tone, broad humor, predictable
-    resolutions. The "rainy Sunday" mood.
+    watch again to relax. Warm tone, broad humor, predictable
+    resolutions.
     """
     COMFORT,
 
-    """High-energy action, exploration, or quest arcs. Propulsive pacing, clear stakes. Pure fear belongs to HORROR."""
+    """High-energy action, exploration, or quest arcs. Fast pacing, clear stakes. Films that mainly aim to frighten belong to HORROR."""
     ADVENTURE,
 
     """Films whose spine is a romantic relationship, regardless of surrounding genre. Excludes films where romance is only a subplot."""
@@ -603,7 +603,7 @@ enum Mood {
     Films that reward attention and reflection: character studies, slow
     cinema, philosophical science fiction, morally ambiguous dramas. Expect
     a longer post-watch conversation than COMFORT; pick this when the user
-    wants something to think about, not unwind to.
+    wants a film to think about afterwards, instead of one to relax with.
     """
     THOUGHTFUL,
 
