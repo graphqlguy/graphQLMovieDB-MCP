@@ -1,6 +1,7 @@
 package com.graphqlguy.moviedb.mcp;
 
 import com.graphqlguy.moviedb.review.Review;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema.CreateMessageResult;
 import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
@@ -12,10 +13,11 @@ import java.util.List;
 
 /**
  * Class 11: borrows the client's model through sampling when the capability
- * was negotiated; otherwise falls back to the server-side summarizer so the
- * tool works against clients that never heard of sampling. The sampling call
- * is slow and costs money, so summarize is cached for a short window, keyed
- * on the movie id, and a repeat call for the same movie skips it entirely.
+ * was negotiated. When the client lacks sampling or refuses the request, it
+ * falls back to the server-side summarizer, so the tool works with every
+ * client. The sampling call is slow and costs money, so summarize is cached
+ * for a short window, keyed on the movie id, and a repeat call for the same
+ * movie skips it entirely.
  *
  * This lives in its own bean instead of as a private method on MovieMcpTools
  * for two reasons. First, @Cacheable only intercepts calls that arrive
@@ -43,12 +45,18 @@ public class SamplingReviewSummarizer {
         String prompt = buildSummarizationPrompt(reviews);
 
         if (context.sampleEnabled()) {
-            CreateMessageResult result = context.sample(s -> s
-                .message(prompt)
-                .systemPrompt("You summarize movie reviews into a few sentences and recurring themes.")
-                .maxTokens(1024));
-            String text = result.content() instanceof TextContent tc ? tc.text() : "";
-            return parseSummary(movieId, reviews.size(), averageScore, text);
+            try {
+                CreateMessageResult result = context.sample(s -> s
+                    .message(prompt)
+                    .systemPrompt("You summarize movie reviews into a few sentences and recurring themes.")
+                    .maxTokens(1024));
+                String text = result.content() instanceof TextContent tc ? tc.text() : "";
+                return parseSummary(movieId, reviews.size(), averageScore, text);
+            } catch (McpError refused) {
+                // The client answered with an error: the user denied the request
+                // (the spec suggests code -1) or the client could not run its
+                // model. Treat it like a missing capability.
+            }
         }
         return serverSideSummarizer.summarize(movieId, reviews, averageScore);
     }
