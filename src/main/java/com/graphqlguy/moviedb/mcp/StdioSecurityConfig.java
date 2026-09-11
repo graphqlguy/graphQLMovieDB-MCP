@@ -35,7 +35,7 @@ public class StdioSecurityConfig {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    // Authenticating as a name the database has never heard of gets you past
+    // Authenticating as a name that is missing from the users table gets you past
     // every scope check and then fails at the first user-scoped operation:
     // WatchlistService resolves the principal to an AppUser row and refuses
     // when there is none. A fixed identity is still an identity, so it needs

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
  * Class 18: a ChatClient wired with the MCP tool callbacks the client starter
  * auto-discovered. The defaultSystem prompt aligns the agent's behavior with the
  * server contract - notably how to handle the null summary from
- * summarizeMovieReviews so the model reports "not enough reviews yet" rather than
- * hallucinating one.
+ * summarizeMovieReviews so the model reports "not enough reviews yet" instead of
+ * inventing a summary.
  */
 @Configuration
 public class ChatConfig {

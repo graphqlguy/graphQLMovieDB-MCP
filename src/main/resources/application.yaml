@@ -47,7 +47,7 @@ spring:
         # (SyncToolSpecification list); the scanner would register duplicates.
         annotation-scanner:
           enabled: false
-  # Class 15: the /mcp chain validates JWTs minted by an external OAuth 2.1
+  # Class 15: the /mcp chain validates JWTs issued by an external OAuth 2.1
   # authorization server. The example points at a Keycloak realm; swap in your
   # platform's issuer. jwk-set-uri keeps the decoder lazy (no fetch at startup),
   # issuer-uri and audiences add iss/aud validation.
@@ -73,8 +73,9 @@ tmdb:
 moviedb:
   mcp:
     # Class 15: the canonical resource URI (RFC 8707). Clients send
-    # resource=<this> when requesting a token; the audiences entry above is the
-    # server half that rejects tokens minted for anything else.
+    # resource=<this> when requesting a token. The audiences entry above must
+    # match the aud value your authorization server issues. Keycloak ignores
+    # resource, so the lesson adds an audience mapper for moviedb-mcp.
     resource: https://api.example.com/mcp
 graphql:
   # Instrumentation configuration

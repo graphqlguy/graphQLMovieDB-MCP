@@ -2,7 +2,7 @@
 <!--
   Class 17: structured JSON logging. Every line is a Logstash-encoded JSON object
   with all MDC entries included, so the trace and span ids Spring's tracing puts
-  in MDC ride along on every log line and filtering by trace id reconstructs one
+  in MDC appear on every log line and filtering by trace id reconstructs one
   tool call. The audit.mcp logger from Class 16 gets its own logger stanza
   (additivity="false") so its stream can be pointed at a separate destination in
   production without duplicating into the application stream.

@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Class 8: the third registration route. We run the annotation scanner's own
- * machinery (SyncMcpToolProvider) by hand, rewrite each tool's description
+ * Class 8: the third registration route. We run the class the annotation
+ * scanner uses (SyncMcpToolProvider) by hand, rewrite each tool's description
  * from the GraphQL schema, and contribute the result as the bean the
  * auto-configuration registers. The annotation scanner itself is disabled in
  * application.yaml so every tool registers exactly once.

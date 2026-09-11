@@ -1,7 +1,7 @@
 [ {
   "name" : "addToWatchlist",
   "title" : "Add To Watchlist",
-  "description" : "Adds a movie or TV show to the signed-in user's watch list and returns the\ncreated entry.\n\nDuplicate contract: each user can hold a given title at most once, enforced\nby the database. Calling this for a title already on the list changes\nnothing and fails with a BAD_REQUEST error whose message says the title is\nalready in the watch list. Agents should treat that specific error as\nconfirmation that the goal state already holds, not as a failure to report\nor retry.\n\nWhen `status` is omitted, the entry is created as WANT_TO_WATCH.",
+  "description" : "Adds a movie or TV show to the signed-in user's watch list and returns the\ncreated entry.\n\nDuplicate contract: each user can hold a given title at most once, enforced\nby the database. Calling this for a title already on the list leaves\nthe list unchanged and fails with a BAD_REQUEST error whose message says the\ntitle is already in the watch list. Agents should treat that specific error as\nconfirmation that the goal state already holds, not as a failure to report\nor retry.\n\nWhen `status` is omitted, the entry is created as WANT_TO_WATCH.",
   "inputSchema" : {
     "$schema" : "https://json-schema.org/draft/2020-12/schema",
     "type" : "object",

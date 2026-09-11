@@ -162,8 +162,8 @@ public class MovieMcpTools {
     public MovieReviewSummary summarizeMovieReviews(
             // Class 10: both special parameters are filled in by the framework
             // and never appear in the tool's input schema. context.progress(...)
-            // reads the client's token on its own and quietly no-ops when
-            // the client did not send one.
+            // reads the client's token on its own and skips the notification
+            // when the client did not send one.
             McpSyncRequestContext context,
             @McpProgressToken String progressToken,
             @McpToolParam(description = "Movie ID, as it appears in the schema.", required = true)
@@ -260,8 +260,8 @@ public class MovieMcpTools {
      * Class 11: three branches. If the agent supplied a status, respect it. If
      * not and the client cannot elicit, resolve to null so the variable is
      * omitted and the WatchlistService records its WANT_TO_WATCH default. If
-     * the client can elicit, ask the one person who knows. Decline, cancel, no
-     * capability, and an empty form all converge on the same fallback; the
+     * the client can elicit, ask the user, who is the only one who knows. Decline,
+     * cancel, no capability, and an empty form all lead to the same fallback; the
      * mutation proceeds either way, because the user asked for the add.
      */
     private WatchStatus resolveStatus(McpSyncRequestContext context, WatchStatus status) {
