@@ -18,8 +18,8 @@ custom_scalars: ./custom-scalars.json
 
 # Local-development shortcut (Class 5): pass the caller's bearer token straight
 # through to Spring so its JWT filter and @PreAuthorize rules keep working.
-# Anywhere beyond your laptop, prefer the transport.auth resource-server block
-# (see mcp-config.yaml comments in the chapter and the Apollo auth docs).
+# Outside local development, use the transport.auth resource-server block
+# instead, which Class 5 shows and the Apollo MCP Server auth docs describe.
 forward_headers:
   - authorization
 
