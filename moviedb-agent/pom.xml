@@ -10,9 +10,10 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.5</version>
-		<!-- Empty relativePath: this module sits next to moviedb/pom.xml on disk,
-		     so without this Maven would resolve ../pom.xml (the moviedb project)
-		     as the parent instead of the Boot parent from the repository. -->
+		<!-- Empty relativePath: this module is a subdirectory of the moviedb project.
+		     Without it, Maven first checks ../pom.xml, finds the moviedb project
+		     instead of the Boot parent, and prints a warning on every build before
+		     it takes the Boot parent from the repository. -->
 		<relativePath/>
 	</parent>
 
