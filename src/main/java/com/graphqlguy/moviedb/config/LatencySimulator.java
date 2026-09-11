@@ -10,8 +10,8 @@ import java.time.Duration;
  * sleeping for the configured {@code demo.latency}. On virtual threads this sleep unmounts
  * the carrier thread, so it faithfully models non-pinning blocking I/O.
  *
- * <p>Centralising the delay here means one property controls it globally, and the same seam
- * can later be backed by a real slow HTTP call (e.g. a WireMock stub) without touching callers.
+ * <p>Centralising the delay here means one property controls it globally, and this class
+ * can later call a real slow HTTP endpoint (e.g. a WireMock stub) while its callers stay unchanged.
  */
 @Component
 @RequiredArgsConstructor
