@@ -3,6 +3,10 @@ spring:
     # CLI agent, no embedded web server.
     web-application-type: none
   ai:
+    model:
+      # The pom has two chat model starters. This property picks the one to use;
+      # without it Spring AI creates both and the ChatClient cannot choose.
+      chat: anthropic
     anthropic:
       api-key: ${ANTHROPIC_API_KEY}
       chat:
