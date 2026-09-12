@@ -106,7 +106,7 @@ public class WatchlistService {
 
     private AppUser requireUser(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Authenticated user does not have a matching record: " + username));
+                .orElseThrow(() -> new EntityNotFoundException("AppUser", "username", username));
     }
 
     private static Long parseId(String rawId, String field) {
