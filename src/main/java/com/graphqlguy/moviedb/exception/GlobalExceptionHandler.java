@@ -11,9 +11,12 @@ import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandle
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -54,6 +57,25 @@ public class GlobalExceptionHandler {
                 .message(field + " " + first.getMessage())
                 .errorType(ErrorType.BAD_REQUEST)
                 .extensions(Map.of("field", field))
+                .build();
+    }
+
+    // An argument value that cannot be converted to its Java type, such as a movie
+    // id that is not a number, is a mistake in the request. Reporting it as
+    // BAD_REQUEST with the argument's name lets the caller correct it.
+    @GraphQlExceptionHandler
+    public GraphQLError handleArgumentConversion(final BindException ex, DataFetchingEnvironment env) {
+        FieldError fieldError = ex.getFieldError();
+        Object rejected = fieldError == null ? null : fieldError.getRejectedValue();
+        String argument = env.getArguments().entrySet().stream()
+                .filter(entry -> Objects.equals(entry.getValue(), rejected))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("an argument");
+        return GraphqlErrorBuilder.newError(env)
+                .message("Invalid value '" + rejected + "' for " + argument)
+                .errorType(ErrorType.BAD_REQUEST)
+                .extensions(Map.of("field", argument))
                 .build();
     }
 
