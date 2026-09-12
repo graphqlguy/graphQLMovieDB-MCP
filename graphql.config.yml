@@ -1,0 +1,24 @@
+# Configuration for GraphQL editor tooling that reads graphql-config, such as
+# the IntelliJ GraphQL plugin and the VS Code GraphQL extension. The
+# application and Apollo MCP Server do not read this file.
+#
+# From Class 4 on, apollo/schema.graphqls is a symlink to the schema below, so
+# that Apollo MCP Server finds the schema next to its own config. Without this
+# file, the IntelliJ GraphQL plugin indexes the symlink as a second schema file
+# and merges both copies into one schema. It then reports every type as
+# defined twice ("tried to redefine existing type") and every input that uses
+# @oneOf as repeating the directive ("should be defined as repeatable").
+#
+# Branches before Class 4 do not have the apollo/ folder, and there the last
+# two settings do not match any files.
+
+# The one schema file the application loads.
+schema: src/main/resources/graphql/schema.graphqls
+
+# The Apollo MCP Server operations, checked against the schema above.
+documents: apollo/operations/**/*.graphql
+
+# Keep this line, even though apollo/schema.graphqls does not match the schema
+# path above. Without it, IntelliJ still loaded both copies and reported the
+# duplicates on the real schema file.
+exclude: apollo/schema.graphqls
