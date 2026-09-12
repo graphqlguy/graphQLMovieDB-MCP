@@ -1,14 +1,11 @@
 package com.graphqlguy.moviedb.security;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
@@ -36,14 +33,9 @@ public class McpSecurityConfig {
         // RFC 9728 section 5.1: a 401 from a protected resource should carry a
         // WWW-Authenticate header with a resource_metadata parameter, which
         // tells a client without a token where the metadata document is.
-        // Spring's default BearerTokenAuthenticationEntryPoint sends a plain
-        // Bearer challenge without that parameter, so we replace it.
-        AuthenticationEntryPoint entryPoint = (request, response, authException) -> {
-            response.setHeader(HttpHeaders.WWW_AUTHENTICATE,
-                "Bearer resource_metadata=" +
-                "\"https://api.example.com/.well-known/oauth-protected-resource/mcp\"");
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        };
+        // Spring Security 7's default BearerTokenAuthenticationEntryPoint adds
+        // that parameter itself, built from the address of the request, so the
+        // chain keeps the default.
         http
             // /mcp is a stateless bearer-token API, so both of these matter.
             // CsrfFilter would otherwise reject every POST without a token,
@@ -76,8 +68,7 @@ public class McpSecurityConfig {
                             "movies:read", "watchlist:read",
                             "watchlist:write", "reviews:read")))
                         .claim("resource_documentation",
-                            "https://graphqlguy.com/docs/tutorial-graphql-mcp")))
-                .authenticationEntryPoint(entryPoint));
+                            "https://graphqlguy.com/docs/tutorial-graphql-mcp"))));
         return http.build();
     }
 }

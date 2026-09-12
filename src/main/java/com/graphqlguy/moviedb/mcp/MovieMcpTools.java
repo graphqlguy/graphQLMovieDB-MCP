@@ -68,9 +68,11 @@ public class MovieMcpTools {
         this(graphql, new ObjectMapper());
     }
 
+    // @Nullable keeps excludeWatched out of the generated input schema's required
+    // list, so a caller can leave it out. The tool treats a missing flag as false.
     public record RecommendInput(
             Mood mood,
-            boolean excludeWatched
+            @Nullable Boolean excludeWatched
     ) {}
 
     public record MovieSummary(
@@ -125,13 +127,13 @@ public class MovieMcpTools {
     @PreAuthorize("hasAuthority('SCOPE_movies:read')")
     public List<MovieSummary> recommendMoviesForMood(
             @McpToolParam(
-                description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDY) and an excludeWatched flag, which the input schema requires on every call. Send false unless the user wants movies they have already marked WATCHED on their watchlist filtered out.",
+                description = "Recommendation input: mood (one of COMFORT, ADVENTURE, ROMANCE, HORROR, THOUGHTFUL, COMEDY) and an optional excludeWatched flag, which defaults to false. Set it to true only when the user wants movies they have already marked WATCHED on their watchlist filtered out.",
                 required = true)
             RecommendInput input) {
 
         Map<String, Object> variables = Map.of(
             "mood", input.mood().name(),
-            "excludeWatched", input.excludeWatched());
+            "excludeWatched", Boolean.TRUE.equals(input.excludeWatched()));
 
         ExecutionGraphQlResponse response = executeOperation(
             "RecommendMoviesForMood",
