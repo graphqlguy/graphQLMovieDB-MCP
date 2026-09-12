@@ -17,6 +17,8 @@ import java.time.Instant;
  * {@code AppUser} (for example "user" or "mara") just by sending that
  * username as the bearer token; {@link #TEST_TOKEN} keeps working for tests
  * that only need an authenticated caller and never touch a user-owned record.
+ * From Class 18 the principal comes from preferred_username, so the decoder
+ * sets that claim to the token text too.
  */
 @TestConfiguration
 public class McpSecurityTestConfig {
@@ -29,6 +31,7 @@ public class McpSecurityTestConfig {
         return token -> Jwt.withTokenValue(token)
             .header("alg", "none")
             .subject(token)
+            .claim("preferred_username", token)
             .claim("scope", ALL_SCOPES)
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plusSeconds(300))

@@ -1,10 +1,13 @@
 package com.graphqlguy.moviedb.agent;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * Class 18: the full loop in a single CLI. chatClient.prompt(...).call().content()
@@ -23,6 +26,9 @@ public class CliRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // One conversation per run. The memory advisor stores the messages under
+        // this id and adds them to every prompt that carries it.
+        String conversationId = UUID.randomUUID().toString();
         try (Scanner in = new Scanner(System.in)) {
             System.out.println("moviedb-agent ready. Ask me about movies.");
             while (true) {
@@ -32,7 +38,11 @@ public class CliRunner implements CommandLineRunner {
                 if (userInput.isBlank()) continue;
                 if ("quit".equalsIgnoreCase(userInput.trim())) break;
 
+                // The tool context becomes the MCP request's _meta, and a progressToken
+                // there asks the server for progress notifications.
                 String response = chatClient.prompt(userInput)
+                    .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
+                    .toolContext(Map.of("progressToken", UUID.randomUUID().toString()))
                     .call()
                     .content();
                 System.out.println(response);

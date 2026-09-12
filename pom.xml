@@ -148,15 +148,20 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
-		<!-- Class 17: tracing. The bridge lets Micrometer's Observation API emit
-		     OpenTelemetry spans; the OTLP exporter ships them to a collector. -->
+		<!-- Class 17: tracing. Spring Boot's OpenTelemetry starter brings the tracing
+		     auto-configuration, the bridge that turns Micrometer observations into
+		     OpenTelemetry spans, and the OTLP exporter that sends them to a collector.
+		     The exclusion removes the starter's OTLP metrics registry, which would push
+		     metrics to localhost:4318 every minute. Metrics stay on Prometheus. -->
 		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing-bridge-otel</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.opentelemetry</groupId>
-			<artifactId>opentelemetry-exporter-otlp</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-opentelemetry</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>io.micrometer</groupId>
+					<artifactId>micrometer-registry-otlp</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Class 17: structured JSON logging with a separate audit.mcp appender
 		     (logback-spring.xml). Boot's one-line logging.structured.format is the

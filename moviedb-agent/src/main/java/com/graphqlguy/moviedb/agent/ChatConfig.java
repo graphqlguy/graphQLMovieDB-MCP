@@ -1,6 +1,8 @@
 package com.graphqlguy.moviedb.agent;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,13 +12,15 @@ import org.springframework.context.annotation.Configuration;
  * auto-discovered. The defaultSystem prompt aligns the agent's behavior with the
  * server contract - notably how to handle the null summary from
  * summarizeMovieReviews so the model reports "not enough reviews yet" instead of
- * inventing a summary.
+ * inventing a summary. The memory advisor adds the earlier messages of the
+ * conversation to each prompt, so a follow-up such as "add your top pick" works.
  */
 @Configuration
 public class ChatConfig {
 
     @Bean
-    public ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider mcpTools) {
+    public ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider mcpTools,
+                                 ChatMemory chatMemory) {
         return builder
             .defaultSystem("""
                 You are a helpful movie recommender. The user is asking for recommendations
@@ -28,7 +32,10 @@ public class ChatConfig {
                 tell the user "not enough reviews yet" instead of guessing. If a tool
                 stages an action and returns a confirmation token, do not confirm it on
                 your own: report what will happen and wait for the user to ask for it.
+                Write every movie you mention as "Title (year), id N". Later turns see your
+                earlier replies but not the tool results, so the ids must be in the replies.
                 """)
+            .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
             .defaultToolCallbacks(mcpTools)
             .build();
     }

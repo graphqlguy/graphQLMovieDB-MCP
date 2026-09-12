@@ -1,5 +1,5 @@
 # Class 17: production profile. Activate with SPRING_PROFILES_ACTIVE=production.
-# Secrets (issuer, audience) come from the environment, never from source; the
+# Secrets (issuer, key set, audience) come from the environment, never from source; the
 # actuator surface is scoped to health/info/prometheus and health details are
 # hidden so nothing leaks to whoever can reach the actuator path.
 spring:
@@ -15,6 +15,9 @@ spring:
           issuer-uri: ${MCP_JWT_ISSUER}
           audiences:
             - ${MCP_JWT_AUDIENCE}
+          # Replaces the base profile's placeholder. Without it the key set is still
+          # fetched from auth.example.com, and every request with a token fails.
+          jwk-set-uri: ${MCP_JWT_JWK_SET_URI}
 
 management:
   endpoints:
@@ -24,7 +27,9 @@ management:
   endpoint:
     health:
       show-details: never
-  otlp:
+  opentelemetry:
     tracing:
-      endpoint: http://otel-collector:4318/v1/traces
-      headers: {}
+      export:
+        otlp:
+          endpoint: http://otel-collector:4318/v1/traces
+          headers: {}
