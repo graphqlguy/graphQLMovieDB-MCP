@@ -59,6 +59,9 @@ spring:
           audiences:
             - moviedb-mcp
           jwk-set-uri: https://auth.example.com/realms/moviedb/protocol/openid-connect/certs
+          # Class 18: a token for a real user names that user in preferred_username,
+          # and the watch list belongs to that username, so it becomes the principal.
+          principal-claim-name: preferred_username
 jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
   expiration: 86400000

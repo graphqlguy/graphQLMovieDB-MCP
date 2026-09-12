@@ -1,0 +1,12 @@
+# Class 18: run the agent against a local model with --spring.profiles.active=ollama.
+# spring.ai.model.chat selects which chat model auto-configuration runs, so the
+# Anthropic starter can stay on the classpath and no API key is needed.
+spring:
+  ai:
+    model:
+      chat: ollama
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        # A model trained for tool calling. Smaller models pick tools less reliably.
+        model: qwen3:8b
