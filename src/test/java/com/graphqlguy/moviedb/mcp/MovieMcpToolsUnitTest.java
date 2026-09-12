@@ -4,6 +4,7 @@ import com.graphqlguy.moviedb.mcp.MovieMcpTools.MovieSummary;
 import com.graphqlguy.moviedb.mcp.MovieMcpTools.RecommendInput;
 import com.graphqlguy.moviedb.recommendation.Mood;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.graphql.ExecutionGraphQlRequest;
 import org.springframework.graphql.ExecutionGraphQlResponse;
@@ -46,5 +47,23 @@ class MovieMcpToolsUnitTest {
         assertThat(result)
             .extracting(MovieSummary::title)
             .containsExactly("Amelie", "Paddington 2");
+    }
+
+    @Test
+    void recommendMoviesForMood_excludeWatchedMissing_shouldSendFalse() {
+        ExecutionGraphQlService graphql = Mockito.mock(ExecutionGraphQlService.class);
+        ExecutionGraphQlResponse response = Mockito.mock(ExecutionGraphQlResponse.class);
+        ResponseField field = Mockito.mock(ResponseField.class);
+        when(field.getValue()).thenReturn(List.of());
+        when(response.field("recommendMoviesForMood")).thenReturn(field);
+        ArgumentCaptor<ExecutionGraphQlRequest> request = ArgumentCaptor.forClass(ExecutionGraphQlRequest.class);
+        when(graphql.execute(request.capture())).thenReturn(Mono.just(response));
+
+        MovieMcpTools tools = new MovieMcpTools(graphql, new ObjectMapper());
+
+        tools.recommendMoviesForMood(new RecommendInput(Mood.COMFORT, null));
+
+        // A caller that leaves the optional flag out gets the GraphQL default.
+        assertThat(request.getValue().getVariables()).containsEntry("excludeWatched", false);
     }
 }
