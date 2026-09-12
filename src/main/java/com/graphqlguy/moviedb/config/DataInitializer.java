@@ -63,7 +63,7 @@ public class DataInitializer {
             AppUser user = userRepo.save(AppUser.builder().username("user").email("user@moviedb.com")
                 .password(passwordEncoder.encode("user123")).role(Role.USER).build());
             AppUser mara    = userRepo.save(AppUser.builder().username("mara").email("mara@example.com")
-                    .password(passwordEncoder.encode("password")).role(Role.USER).build());
+                    .password(passwordEncoder.encode("mara123")).role(Role.USER).build());
             AppUser petra   = userRepo.save(AppUser.builder().username("petra").email("petra@example.com")
                     .password(passwordEncoder.encode("password")).role(Role.USER).build());
             AppUser dan     = userRepo.save(AppUser.builder().username("dan").email("dan@example.com")
