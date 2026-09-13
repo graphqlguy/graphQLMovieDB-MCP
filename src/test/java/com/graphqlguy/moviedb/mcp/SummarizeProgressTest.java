@@ -21,7 +21,7 @@ class SummarizeProgressTest {
         McpSyncRequestContext context = Mockito.mock(McpSyncRequestContext.class);
 
         MovieReviewSummary summary =
-            tools.summarizeMovieReviews(context, "progress-token-1", "1");
+            tools.summarizeMovieReviews(context, "1");
 
         assertThat(summary.reviewCount()).isGreaterThanOrEqualTo(5);
         // progress() is overloaded (Consumer vs ProgressNotification); the type
