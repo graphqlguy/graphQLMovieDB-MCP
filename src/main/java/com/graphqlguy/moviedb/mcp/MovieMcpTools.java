@@ -9,7 +9,6 @@ import com.graphqlguy.moviedb.review.Review;
 import com.graphqlguy.moviedb.watchlist.WatchStatus;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.ElicitResult;
-import org.springframework.ai.mcp.annotation.McpProgressToken;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
@@ -157,12 +156,11 @@ public class MovieMcpTools {
             idempotentHint = true,
             openWorldHint = false))
     public MovieReviewSummary summarizeMovieReviews(
-            // Class 10: both special parameters are filled in by the framework
-            // and never appear in the tool's input schema. context.progress(...)
-            // reads the client's token on its own and skips the notification
-            // when the client did not send one.
+            // Class 10: the framework fills in the request context, and the tool's
+            // input schema leaves it out. context.progress(...) reads the
+            // client's progress token on its own and skips the notification when
+            // the client did not send one.
             McpSyncRequestContext context,
-            @McpProgressToken String progressToken,
             @McpToolParam(description = "Movie ID, as it appears in the schema.", required = true)
             String movieId) {
 
