@@ -7,17 +7,19 @@ import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import org.springframework.ai.mcp.annotation.context.McpSyncRequestContext;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import reactor.core.Exceptions;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Class 11: borrows the client's model through sampling when the capability
- * was negotiated. When the client lacks sampling or refuses the request, it
- * falls back to the server-side summarizer, so the tool works with every
- * client. The sampling call is slow and costs money, so summarize is cached
- * for a short window, keyed on the movie id, and a repeat call for the same
- * movie skips it entirely.
+ * was negotiated. When the client lacks sampling, refuses the request, or
+ * does not answer in time, it falls back to the server-side summarizer, so
+ * the tool works with every client. The sampling call is slow and costs
+ * money, so summarize is cached for a short window, keyed on the movie id,
+ * and a repeat call for the same movie skips it entirely.
  *
  * This lives in its own bean instead of as a private method on MovieMcpTools
  * for two reasons. First, @Cacheable only intercepts calls that arrive
@@ -56,6 +58,15 @@ public class SamplingReviewSummarizer {
                 // The client answered with an error: the user denied the request
                 // (the spec suggests code -1) or the client could not run its
                 // model. Treat it like a missing capability.
+            } catch (RuntimeException unanswered) {
+                // The client did not answer within spring.ai.mcp.server.request-timeout
+                // (20 seconds by default). The SDK's timeout raises a TimeoutException,
+                // and the blocking sample(...) call wraps it in a Reactor exception.
+                // Treat it like a refusal. Any other exception is a bug, so it
+                // still reaches the caller.
+                if (!(Exceptions.unwrap(unanswered) instanceof TimeoutException)) {
+                    throw unanswered;
+                }
             }
         }
         return serverSideSummarizer.summarize(movieId, reviews, averageScore);
