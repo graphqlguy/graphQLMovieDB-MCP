@@ -2,6 +2,7 @@ package com.graphqlguy.moviedb.mcp;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,11 @@ public class SessionRateLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) {
+        // A streamed MCP response finishes on a second, ASYNC dispatch of the
+        // same request, and Spring MVC runs interceptors on it again. Count
+        // each request once.
+        if (req.getDispatcherType() == DispatcherType.ASYNC) return true;
+
         String path = req.getRequestURI();
         if (!path.equals("/mcp") && !path.startsWith("/mcp/")) return true;
 
